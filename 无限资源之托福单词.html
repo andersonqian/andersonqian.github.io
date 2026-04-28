@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>无限资源 - 英语单词拼写大冒险</title>
+<style>
+  :root {
+    --ui-scale: 1;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a1a2e;
+    font-family: 'Press Start 2P', 'Courier New', monospace;
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-size: calc(16px * var(--ui-scale));
+  }
+
+  /* ===== SKY & GROUND ===== */
+  #game-world {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #87CEEB 0%, #87CEEB 55%, #5a8f3c 55%, #5a8f3c 60%, #6b4226 60%, #6b4226 100%);
+  }
+
+  /* Pixel clouds */
+  .cloud {
+    position: absolute;
+    background: #fff;
+    image-rendering: pixelated;
+  }
+
+  /* ===== TITLE SCREEN ===== */
+  #title-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  #title-screen h1 {
+    font-size: 3em;
+    color: #5ce65c;
+    text-shadow: 4px 4px #1a7a1a, 8px 8px #000;
+    margin-bottom: 20px;
+    animation: titlePulse 2s infinite;
+  }
+
+  #title-screen h2 {
+    font-size: 1em;
+    color: #ffd700;
+    margin-bottom: 40px;
+    text-shadow: 2px 2px #000;
+  }
+
+  @keyframes titlePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .mc-btn {
+    background: #7c7c7c;
+    border: 4px solid;
+    border-color: #fff #555 #555 #fff;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.7em;
+    padding: 12px 24px;
+    cursor: pointer;
+    margin: 8px;
+    text-shadow: 2px 2px #000;
+    image-rendering: pixelated;
+    transition: background 0.1s;
+  }
+
+  .mc-btn:hover {
+    background: #9a9a9a;
+    border-color: #fff #777 #777 #fff;
+  }
+
+  .mc-btn:active {
+    background: #5a5a5a;
+    border-color: #555 #fff #fff #555;
+    transform: translate(2px, 2px);
+  }
+
+  /* ===== GAME HUD ===== */
+  #game-hud {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    padding: 10px 20px;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  #player-hud {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 220px;
+  }
+
+  #player-hud-label {
+    color: #77ccff;
+    font-size: 0.45em;
+  }
+
+  #player-hp-wrap {
+    width: 150px;
+    border: 2px solid #555;
+    background: #222;
+    padding: 1px;
+  }
+
+  #player-hp-bar {
+    height: 12px;
+    width: 100%;
+    background: linear-gradient(90deg, #22aaff, #55ddff);
+    transition: width 0.4s ease;
+  }
+
+  #player-hp-text {
+    color: #77ccff;
+    font-size: 0.45em;
+    min-width: 56px;
+    text-align: right;
+  }
+
+  #player-hp-bar.damage {
+    animation: flashBlue 0.25s 2;
+  }
+
+  #player-hp-bar.heal {
+    animation: flashAqua 0.25s 2;
+  }
+
+  @keyframes flashBlue {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @keyframes flashAqua {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  #game-title-hud {
+    color: #5ce65c;
+    font-size: 0.55em;
+    text-shadow: 2px 2px #000;
+  }
+
+  #word-progress {
+    color: #ffd700;
+    font-size: 0.5em;
+  }
+
+  #streak-display {
+    color: #ff6b35;
+    font-size: 0.5em;
+  }
+
+  /* ===== MAIN GAME AREA ===== */
+  #game-area {
+    display: none;
+    padding-top: 80px;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* ===== MONSTER ARENA ===== */
+  #arena {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+  }
+
+  /* ===== MONSTER DISPLAY ===== */
+  #monster-container {
+    position: relative;
+    margin: 20px 0;
+    text-align: center;
+  }
+
+  #monster-name {
+    font-size: 0.7em;
+    color: #ff4444;
+    text-shadow: 2px 2px #000;
+    margin-bottom: 10px;
+  }
+
+  /* Health Bar */
+  #health-bar-container {
+    width: 300px;
+    margin: 0 auto 20px;
+    border: 4px solid #555;
+    background: #222;
+    padding: 2px;
+  }
+
+  #health-bar-label {
+    font-size: 0.4em;
+    color: #ff4444;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  #health-bar {
+    height: 20px;
+    background: linear-gradient(90deg, #ff0000, #ff6600);
+    transition: width 0.5s ease;
+    image-rendering: pixelated;
+    position: relative;
+  }
+
+  #health-bar.healing {
+    background: linear-gradient(90deg, #ff4444, #ff0000);
+    animation: flashRed 0.3s 3;
+  }
+
+  @keyframes flashRed {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  #health-bar.hurt {
+    background: linear-gradient(90deg, #00cc00, #00ff44);
+    animation: flashGreen 0.3s 3;
+  }
+
+  @keyframes flashGreen {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Pixel Monster Art */
+  #monster-sprite {
+    width: 200px;
+    height: 200px;
+    image-rendering: pixelated;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .monster-canvas {
+    image-rendering: pixelated;
+  }
+
+  /* Monster shake animation */
+  @keyframes monsterHurt {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-8px); }
+    80% { transform: translateX(8px); }
+  }
+
+  @keyframes monsterHeal {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .monster-hurt { animation: monsterHurt 0.5s; }
+  .monster-heal { animation: monsterHeal 0.5s; }
+
+  /* ===== BATTLE MESSAGES ===== */
+  #battle-msg {
+    font-size: 0.55em;
+    min-height: 30px;
+    margin: 10px 0;
+    padding: 8px 16px;
+    text-align: center;
+    border: 3px solid transparent;
+  }
+
+  #battle-msg.correct {
+    color: #5ce65c;
+    border-color: #5ce65c;
+    background: rgba(92, 230, 92, 0.1);
+  }
+
+  #battle-msg.wrong {
+    color: #ff4444;
+    border-color: #ff4444;
+    background: rgba(255, 68, 68, 0.1);
+  }
+
+  #battle-msg.info {
+    color: #ffd700;
+    border-color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+  }
+
+  /* ===== WORD INPUT AREA ===== */
+  #word-panel {
+    width: 100%;
+    max-width: 700px;
+    background: rgba(0,0,0,0.8);
+    border: 4px solid #555;
+    padding: 20px;
+    margin: 10px auto;
+  }
+
+  #word-hint {
+    font-size: 0.55em;
+    color: #aaa;
+    margin-bottom: 10px;
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  #word-meaning {
+    font-size: 0.65em;
+    color: #ffd700;
+    text-align: center;
+    margin-bottom: 15px;
+    padding: 8px;
+    border: 2px solid #555;
+    background: rgba(255,215,0,0.1);
+  }
+
+  #input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  #word-input {
+    background: #222;
+    border: 4px solid #555;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8em;
+    padding: 10px 16px;
+    width: 300px;
+    outline: none;
+    text-transform: lowercase;
+  }
+
+  #word-input:focus {
+    border-color: #5ce65c;
+    box-shadow: 0 0 10px rgba(92, 230, 92, 0.3);
+  }
+
+  #word-input.wrong-shake {
+    animation: shake 0.3s;
+    border-color: #ff4444;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  /* ===== STREAK INDICATOR ===== */
+  #streak-bar {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 10px 0;
+  }
+
+  .streak-gem {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #555;
+    background: #333;
+    image-rendering: pixelated;
+    position: relative;
+    transition: all 0.2s;
+  }
+
+  .streak-gem.filled {
+    background: #00aaff;
+    border-color: #55ccff;
+    box-shadow: 0 0 8px #00aaff;
+    animation: gemPop 0.3s;
+  }
+
+  @keyframes gemPop {
+    0% { transform: scale(0.5); }
+    60% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+  }
+
+  /* ===== PARTICLES / EFFECTS ===== */
+  .damage-float {
+    position: fixed;
+    font-size: 1.2em;
+    font-family: 'Press Start 2P', monospace;
+    pointer-events: none;
+    animation: floatUp 1.5s forwards;
+    z-index: 500;
+    text-shadow: 2px 2px #000;
+  }
+
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
+  }
+
+  /* ===== BOSS SPECIAL ===== */
+  #boss-warning {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(180,0,0,0.7);
+    z-index: 900;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    animation: bossWarningAnim 0.5s 4 alternate;
+  }
+
+  @keyframes bossWarningAnim {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  #boss-warning h1 {
+    font-size: 2.5em;
+    color: #ff4444;
+    text-shadow: 4px 4px #000;
+    animation: bossTextPulse 0.5s infinite;
+  }
+
+  @keyframes bossTextPulse {
+    0%, 100% { color: #ff4444; }
+    50% { color: #ffff00; }
+  }
+
+  /* ===== VICTORY SCREEN ===== */
+  #victory-screen {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    z-index: 1000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #victory-screen h1 {
+    font-size: 2em;
+    color: #ffd700;
+    text-shadow: 4px 4px #000;
+    animation: victoryShine 1s infinite;
+    margin-bottom: 20px;
+  }
+
+  @keyframes victoryShine {
+    0%, 100% { color: #ffd700; text-shadow: 4px 4px #000; }
+    50% { color: #ffffff; text-shadow: 0 0 20px #ffd700, 4px 4px #000; }
+  }
+
+  #victory-screen .stats {
+    font-size: 0.5em;
+    color: #aaa;
+    line-height: 2.5;
+    text-align: center;
+    margin: 20px 0;
+  }
+
+  #game-over-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.92);
+    z-index: 1100;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #game-over-screen h1 {
+    color: #ff5555;
+    font-size: 1.6em;
+    text-shadow: 4px 4px #000;
+    margin-bottom: 14px;
+  }
+
+  #game-over-screen .stats {
+    font-size: 0.5em;
+    color: #bbb;
+    line-height: 2.2;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+
+  /* ===== PIXELS / MINECRAFT TILES ===== */
+  .dirt-border {
+    border: 8px solid transparent;
+    border-image: repeating-linear-gradient(
+      45deg,
+      #6b4226 0px, #6b4226 8px,
+      #8b5e3c 8px, #8b5e3c 16px
+    ) 8;
+  }
+
+  /* ===== MONSTER DEFEATED FLASH ===== */
+  #defeat-flash {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 800;
+    transition: opacity 0.1s;
+  }
+
+  /* ===== SPEAK BUTTON ===== */
+  #speak-btn {
+    background: #2244aa;
+    border: 4px solid;
+    border-color: #4466cc #112288 #112288 #4466cc;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.55em;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+
+  #speak-btn:hover { background: #3355bb; }
+
+  #item-panel {
+    margin-top: 14px;
+    border: 3px solid #444;
+    background: rgba(20, 20, 20, 0.75);
+    padding: 10px;
+  }
+
+  #item-title {
+    font-size: 0.45em;
+    color: #66cc66;
+    margin-bottom: 8px;
+  }
+
+  #item-list {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .item-btn {
+    background: #2a2a2a;
+    border: 3px solid #666;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.45em;
+    padding: 6px 8px;
+    cursor: pointer;
+  }
+
+  .item-btn:hover {
+    background: #404040;
+    border-color: #88aa88;
+  }
+
+  .item-empty {
+    font-size: 0.42em;
+    color: #888;
+  }
+
+  #effect-status {
+    margin-top: 8px;
+    font-size: 0.42em;
+    color: #cfefff;
+    min-height: 14px;
+  }
+
+  /* ===== PIXEL SWORD SWING EFFECT ===== */
+  .sword-effect {
+    position: fixed;
+    font-size: 3em;
+    pointer-events: none;
+    z-index: 600;
+    animation: swordSwing 0.6s forwards;
+  }
+
+  @keyframes swordSwing {
+    0% { opacity: 1; transform: rotate(0deg) scale(0.5); }
+    50% { opacity: 1; transform: rotate(-30deg) scale(1.5); }
+    100% { opacity: 0; transform: rotate(30deg) scale(0.8); }
+  }
+
+  /* Scrolling background blocks */
+  #bg-blocks {
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 80px;
+    background: 
+      repeating-linear-gradient(90deg,
+        #5a8f3c 0px, #5a8f3c 32px,
+        #4a7f2c 32px, #4a7f2c 64px
+      );
+    z-index: 1;
+  }
+
+  #bg-dirt {
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 40px;
+    background: repeating-linear-gradient(90deg,
+      #6b4226 0px, #6b4226 32px,
+      #5a3418 32px, #5a3418 64px
+    );
+    z-index: 1;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 600px) {
+    #title-screen h1 { font-size: 1.8em; }
+    #game-hud { gap: 10px; padding: 8px 10px; }
+    #player-hud { min-width: 180px; }
+    #player-hp-wrap { width: 110px; }
+    #word-input { width: 220px; font-size: 0.65em; }
+    #input-row { gap: 6px; }
+    .mc-btn { font-size: 0.56em; padding: 10px 14px; }
+    #speak-btn { font-size: 0.45em; padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ====== TITLE SCREEN ====== -->
+<div id="title-screen">
+  <div style="font-size:5em; margin-bottom:10px;">⚔️</div>
+  <h1>无限资源</h1>
+  <h2>英语单词拼写大冒险</h2>
+  <div style="font-size:0.4em; color:#aaa; margin-bottom:30px; text-align:center; line-height:2;">
+    念出单词 → 拼写正确 → 打败怪兽！<br>
+    连续拼对5个 → 怪物消灭<br>
+    最后10词 → 面对大Boss！
+  </div>
+  <button class="mc-btn" onclick="startGame()" style="font-size:0.8em; padding:16px 40px; background:#2a5a2a; border-color:#5ce65c #1a3a1a #1a3a1a #5ce65c; color:#5ce65c;">
+    ▶ 开始游戏
+  </button>
+  <button class="mc-btn" onclick="testSpeech()" style="margin-top:10px;">
+    🔊 测试语音
+  </button>
+  <div style="font-size:0.3em; color:#666; margin-top:30px;">共 <span id="total-count"></span> 个单词</div>
+</div>
+
+<!-- ====== BOSS WARNING ====== -->
+<div id="boss-warning">
+  <div style="font-size:5em; animation: bossTextPulse 0.5s infinite;">💀</div>
+  <h1>⚠ 大Boss来袭！⚠</h1>
+  <div style="font-size:0.6em; color:#ffcc00; margin-top:20px; text-align:center; line-height:2;">
+    最后10个单词！<br>击败大Boss即可通关！
+  </div>
+</div>
+
+<!-- ====== DEFEAT FLASH ====== -->
+<div id="defeat-flash"></div>
+
+<!-- ====== GAME HUD ====== -->
+<div id="game-hud" style="display:none;">
+  <span id="game-title-hud">⚔ 无限资源</span>
+  <span id="word-progress">单词: 0/0</span>
+  <span id="streak-display">连击: 0</span>
+  <span id="monster-counter" style="color:#ff88aa; font-size:0.5em;">怪物: 0</span>
+  <div id="player-hud">
+    <span id="player-hud-label">玩家HP</span>
+    <div id="player-hp-wrap"><div id="player-hp-bar"></div></div>
+    <span id="player-hp-text">100/100</span>
+  </div>
+</div>
+
+<!-- ====== GAME AREA ====== -->
+<div id="game-area">
+  <div id="arena">
+    <!-- Monster -->
+    <div id="monster-container">
+      <div id="monster-name">ZOMBIE</div>
+      <div id="health-bar-container">
+        <div id="health-bar-label">
+          <span>❤ 血量</span>
+          <span id="hp-text">100/100</span>
+        </div>
+        <div id="health-bar" style="width:100%"></div>
+      </div>
+      <div id="monster-sprite">
+        <canvas id="monster-canvas" class="monster-canvas" width="160" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- Streak Gems -->
+    <div style="font-size:0.4em; color:#aaa; margin-bottom:5px;">连击进度 (连续5个击败怪物)</div>
+    <div id="streak-bar">
+      <div class="streak-gem" id="gem-0"></div>
+      <div class="streak-gem" id="gem-1"></div>
+      <div class="streak-gem" id="gem-2"></div>
+      <div class="streak-gem" id="gem-3"></div>
+      <div class="streak-gem" id="gem-4"></div>
+    </div>
+
+    <!-- Battle Message -->
+    <div id="battle-msg" class="info">听发音，然后拼写单词！</div>
+
+    <!-- Word Panel -->
+    <div id="word-panel">
+      <div id="word-meaning">...</div>
+      <div id="word-hint" style="display:none;"></div>
+      <div id="input-row">
+        <button id="speak-btn" onclick="speakCurrentWord()">🔊 再次播放</button>
+        <input type="text" id="word-input" placeholder="输入单词..." autocomplete="off" autocorrect="off" spellcheck="false" />
+        <button class="mc-btn" onclick="submitWord()">⚔ 攻击!</button>
+      </div>
+      <div id="item-panel">
+        <div id="item-title">背包（打败怪物后随机掉落《我的世界》道具）</div>
+        <div id="item-list"></div>
+        <div id="effect-status"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====== VICTORY SCREEN ====== -->
+<div id="victory-screen">
+  <div style="font-size:4em;">🏆</div>
+  <h1>通关成功！</h1>
+  <div style="font-size:0.5em; color:#5ce65c; margin:10px 0;">大Boss已被击败！</div>
+  <div class="stats" id="victory-stats"></div>
+  <button class="mc-btn" onclick="restartGame()" style="background:#2a5a2a; border-color:#5ce65c #1a3a1a #1a3a1a #5ce65c; color:#5ce65c;">
+    ↺ 再玩一次
+  </button>
+</div>
+
+<!-- ====== GAME OVER SCREEN ====== -->
+<div id="game-over-screen">
+  <div style="font-size:4em;">☠️</div>
+  <h1>挑战失败</h1>
+  <div class="stats" id="game-over-stats"></div>
+  <button class="mc-btn" onclick="restartGame()" style="background:#7a2222; border-color:#ff6666 #4a1111 #4a1111 #ff6666; color:#ffd7d7;">
+    ↺ 重新挑战
+  </button>
+</div>
+
+<!-- ====== Background ====== -->
+<div id="bg-blocks"></div>
+<div id="bg-dirt"></div>
+
+<script>
+// ============================================================
+// WORD DATA
+// ============================================================
+const WORD_LIST = [
+  {"word": "archaeology", "meaning": "考古学"},
+  {"word": "prehistory", "meaning": "史前时期"},
+  {"word": "stone age", "meaning": "石器时代"},
+  {"word": "neolithic", "meaning": "新石器时代的"},
+  {"word": "paleolithic", "meaning": "旧石器时代的"},
+  {"word": "bronze age", "meaning": "青铜时代"},
+  {"word": "primitive", "meaning": "原始的；最早的；早期的"},
+  {"word": "subsequent", "meaning": "后来的，随后的"},
+  {"word": "antiquity", "meaning": "古老；古代；古迹；古物"},
+  {"word": "civilization", "meaning": "文明"},
+  {"word": "settlement", "meaning": "定居，安居地"},
+  {"word": "inhabitant", "meaning": "居民"},
+  {"word": "debris", "meaning": "碎片，残骸"},
+  {"word": "remains", "meaning": "残余，遗骸；遗迹"},
+  {"word": "ruins", "meaning": "废墟；（建筑物）倒塌"},
+  {"word": "specimen", "meaning": "样品；范例；标本"},
+  {"word": "indicator", "meaning": "指示物"},
+  {"word": "speculation", "meaning": "推断"},
+  {"word": "surmise", "meaning": "猜测；推测"},
+  {"word": "documentation", "meaning": "记录"},
+  {"word": "excavation", "meaning": "挖掘；发掘物"},
+  {"word": "oversee", "meaning": "监督，监视"},
+  {"word": "scratch", "meaning": "擦，刮；划痕"},
+  {"word": "decipher", "meaning": "破解；解译"},
+  {"word": "crane", "meaning": "吊车，起重机"},
+  {"word": "mechanic", "meaning": "技工，机修工"},
+  {"word": "hieroglyph", "meaning": "象形文字；秘密符号"},
+  {"word": "pictograph", "meaning": "象形文字"},
+  {"word": "inscription", "meaning": "铭文；碑文"},
+  {"word": "sacrificial vessel", "meaning": "供具；礼器"},
+  {"word": "camp site", "meaning": "营地"},
+  {"word": "spear", "meaning": "矛；枪；嫩枝"},
+  {"word": "artifact", "meaning": "人工制品（尤指原始工具）"},
+  {"word": "cache", "meaning": "藏物处；隐藏处"},
+  {"word": "fertile", "meaning": "富饶的，肥沃的"},
+  {"word": "hub", "meaning": "中心"},
+  {"word": "inundation", "meaning": "洪水；泛滥"},
+  {"word": "mobile", "meaning": "可移动的；行动自如的"},
+  {"word": "band", "meaning": "队；群"},
+  {"word": "tribe", "meaning": "部落；族"},
+  {"word": "chiefdom", "meaning": "酋邦；酋长的领地"},
+  {"word": "state", "meaning": "国家；州"},
+  {"word": "horde", "meaning": "群；游牧部落"},
+  {"word": "alliance", "meaning": "联盟；联合；联姻"},
+  {"word": "federal", "meaning": "联邦的；同盟的"},
+  {"word": "federation", "meaning": "联合；联邦；联盟"},
+  {"word": "hierarchy", "meaning": "层级；等级制度"},
+  {"word": "cradle", "meaning": "发源地；发祥地；摇篮"},
+  {"word": "site", "meaning": "地点；遗迹；遗址"},
+  {"word": "sedentary", "meaning": "定居的"},
+  {"word": "nomadic", "meaning": "游牧的"},
+  {"word": "mound", "meaning": "土堆；小丘"},
+  {"word": "ditch", "meaning": "深沟；凹陷"},
+  {"word": "drainage", "meaning": "排水；排水系统"},
+  {"word": "channel", "meaning": "沟渠；v.挖沟"},
+  {"word": "hunter-gatherer", "meaning": "采集狩猎的人"},
+  {"word": "egalitarian", "meaning": "平等主义（的）"},
+  {"word": "feudalism", "meaning": "封建主义；封建制度"},
+  {"word": "prevalent", "meaning": "流行的；普遍的"},
+  {"word": "agriculture", "meaning": "农业"},
+  {"word": "cultivate", "meaning": "耕种；种植"},
+  {"word": "domesticate", "meaning": "驯养"},
+  {"word": "portage", "meaning": "搬运；运输"},
+  {"word": "mass transport", "meaning": "大宗运输"},
+  {"word": "conveyance", "meaning": "运输；运输工具"},
+  {"word": "canoe", "meaning": "独木舟；轻舟"},
+  {"word": "vessel", "meaning": "船，舰；容器"},
+  {"word": "utensil", "meaning": "用具，器皿"},
+  {"word": "mining", "meaning": "采矿"},
+  {"word": "labor", "meaning": "劳动；劳工"},
+  {"word": "plow", "meaning": "犁（地）；耕地"},
+  {"word": "era", "meaning": "时代；年代；纪元"},
+  {"word": "medieval", "meaning": "中世纪的"},
+  {"word": "industrial revolution", "meaning": "工业革命"},
+  {"word": "colony", "meaning": "殖民地"},
+  {"word": "colonize", "meaning": "开拓为殖民地"},
+  {"word": "conquer", "meaning": "战胜，征服；攻克"},
+  {"word": "imperial", "meaning": "帝国的；皇帝的"},
+  {"word": "roman empire", "meaning": "罗马帝国"},
+  {"word": "emperor", "meaning": "皇帝；君主"},
+  {"word": "clergy", "meaning": "神职人员；牧师"},
+  {"word": "monastery", "meaning": "修道院"},
+  {"word": "worship", "meaning": "崇拜；礼拜；尊敬"},
+  {"word": "worshipper", "meaning": "崇拜者；敬神者"},
+  {"word": "prayer", "meaning": "祈祷，祷告"},
+  {"word": "aristocracy", "meaning": "贵族；贵族统治"},
+  {"word": "aristocrat", "meaning": "贵族"},
+  {"word": "throne", "meaning": "王座；君主；王权"},
+  {"word": "monarch", "meaning": "帝王，君主"},
+  {"word": "monarchy", "meaning": "君主制；君主国"},
+  {"word": "noble", "meaning": "高尚的；贵族的"},
+  {"word": "peasant", "meaning": "农民；乡下人"},
+  {"word": "knight", "meaning": "骑士"},
+  {"word": "veteran", "meaning": "老兵；老手"},
+  {"word": "route", "meaning": "路线，航线"},
+  {"word": "benchmark", "meaning": "基准"}
+];
+
+// ============================================================
+// MONSTERS CONFIG
+// ============================================================
+const MONSTERS = [
+  { name: "僵尸 ZOMBIE",    color: "#2d8a2d", eyeColor: "#ff0000", type: "zombie"   },
+  { name: "骷髅 SKELETON",  color: "#c8c8c8", eyeColor: "#222222", type: "skeleton" },
+  { name: "蜘蛛 SPIDER",    color: "#111111", eyeColor: "#ff4400", type: "spider"   },
+  { name: "苦力怕 CREEPER", color: "#3d8c3d", eyeColor: "#000000", type: "creeper"  },
+  { name: "末影人 ENDERMAN",color: "#1a1a1a", eyeColor: "#aa00ff", type: "enderman" },
+  { name: "女巫 WITCH",     color: "#4a1a6e", eyeColor: "#00ff88", type: "witch"    },
+  { name: "烈焰人 BLAZE",   color: "#ffa500", eyeColor: "#ffff00", type: "blaze"    },
+  { name: "僵尸猪人 PIGLIN",color: "#ff8888", eyeColor: "#ff0000", type: "piglin"   },
+];
+
+const BOSS = {
+  name: "💀 末影龙 ENDER DRAGON 💀",
+  color: "#330033",
+  eyeColor: "#ff00ff",
+  type: "dragon"
+};
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let gameWords = [];
+let currentWordIndex = 0;
+let currentMonsterIndex = 0;
+let streak = 0;         // consecutive correct
+let monsterHP = 100;
+let maxHP = 100;
+let playerHP = 100;
+const playerMaxHP = 100;
+let isBoss = false;
+let bossActive = false;
+let totalCorrect = 0;
+let totalWrong = 0;
+let monstersDefeated = 0;
+let gameStarted = false;
+let inventory = {};
+let shieldCharges = 0;
+let nextDoubleDamage = false;
+
+const ITEMS = [
+  { id: 'bread', name: '面包', icon: '🍞', desc: '恢复20HP' },
+  { id: 'golden_apple', name: '金苹果', icon: '🍎', desc: '恢复满血' },
+  { id: 'diamond_armor', name: '钻石盔甲', icon: '🛡️', desc: '下次免伤' },
+  { id: 'diamond_sword', name: '钻石剑', icon: '🗡️', desc: '下次双倍伤害' },
+  { id: 'tnt', name: 'TNT', icon: '💣', desc: '造成50伤害' },
+  { id: 'enchanted_book', name: '附魔书', icon: '📖', desc: '显示首字母提示' },
+  { id: 'speed_potion', name: '速度药水', icon: '🧪', desc: '跳过当前单词' },
+  { id: 'ender_pearl', name: '末影珍珠', icon: '🧲', desc: '显示完整单词3秒' }
+];
+
+// ============================================================
+// INIT
+// ============================================================
+document.getElementById('total-count').textContent = WORD_LIST.length;
+
+document.getElementById('word-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') submitWord();
+});
+
+// ============================================================
+// PIXEL MONSTER DRAWING
+// ============================================================
+function drawMonster(type, isBossMode) {
+  const canvas = document.getElementById('monster-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, 160, 160);
+
+  const S = 8; // pixel size
+
+  function px(x, y, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x * S, y * S, S, S);
+  }
+
+  function rect(x, y, w, h, color) {
+    for (let i = x; i < x + w; i++)
+      for (let j = y; j < y + h; j++)
+        px(i, j, color);
+  }
+
+  if (isBossMode) {
+    // Dragon / Big Boss
+    const dc = "#440044";
+    const sc = "#220022";
+    const wc = "#662266";
+    const ec = "#ff00ff";
+    // body
+    rect(5, 4, 10, 8, dc);
+    rect(6, 5, 8, 6, sc);
+    // eyes
+    rect(6, 5, 2, 2, ec);
+    rect(12, 5, 2, 2, ec);
+    // wings
+    rect(0, 3, 5, 5, wc);
+    rect(15, 3, 5, 5, wc);
+    rect(1, 2, 3, 1, wc);
+    rect(16, 2, 3, 1, wc);
+    // tail
+    rect(9, 12, 3, 3, dc);
+    rect(10, 15, 2, 2, dc);
+    rect(11, 17, 1, 1, dc);
+    // legs
+    rect(6, 12, 2, 3, dc);
+    rect(12, 12, 2, 3, dc);
+    // spikes
+    rect(7, 3, 1, 2, wc);
+    rect(9, 2, 1, 2, wc);
+    rect(11, 3, 1, 2, wc);
+    if (isBossMode) {
+      // glow effect
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = "#ff00ff";
+    }
+    return;
+  }
+
+  const m = getCurrentMonsterConfig();
+  const c = m.color;
+  const e = m.eyeColor;
+
+  switch (type) {
+    case "zombie": {
+      rect(5, 1, 6, 6, c);       // head
+      rect(5, 7, 6, 8, "#1a5c1a"); // body
+      rect(3, 7, 2, 7, "#1a5c1a"); // left arm
+      rect(11, 7, 2, 7, "#1a5c1a"); // right arm
+      rect(5, 15, 3, 4, "#1a5c1a"); // left leg
+      rect(8, 15, 3, 4, "#1a5c1a"); // right leg
+      rect(6, 3, 2, 2, e); rect(9, 3, 2, 2, e); // eyes
+      rect(6, 6, 4, 1, "#000"); // mouth
+      break;
+    }
+    case "skeleton": {
+      rect(5, 1, 6, 6, c);
+      rect(6, 7, 4, 7, "#aaa");
+      rect(4, 7, 2, 6, "#aaa");
+      rect(10, 7, 2, 6, "#aaa");
+      rect(5, 14, 3, 5, "#aaa");
+      rect(8, 14, 3, 5, "#aaa");
+      rect(6, 3, 2, 2, e); rect(9, 3, 2, 2, e);
+      rect(6, 6, 1, 1, "#000"); rect(8, 6, 2, 1, "#000"); rect(10, 6, 1, 1, "#000");
+      break;
+    }
+    case "spider": {
+      rect(4, 6, 8, 6, "#111");
+      rect(6, 4, 4, 3, "#111");
+      // legs
+      for (let i = 0; i < 4; i++) {
+        rect(1, 5 + i * 2, 3, 1, "#111");
+        rect(12, 5 + i * 2, 3, 1, "#111");
+      }
+      rect(6, 5, 2, 2, e); rect(10, 5, 2, 2, e);
+      rect(5, 5, 1, 2, e); rect(11, 5, 1, 2, e);
+      break;
+    }
+    case "creeper": {
+      rect(5, 1, 6, 6, c);
+      rect(5, 7, 6, 8, c);
+      rect(5, 15, 3, 4, c);
+      rect(8, 15, 3, 4, c);
+      rect(6, 3, 2, 2, e); rect(9, 3, 2, 2, e);
+      rect(7, 5, 2, 1, "#000"); rect(6, 6, 1, 1, "#000"); rect(9, 6, 1, 1, "#000");
+      rect(7, 6, 2, 1, "#000");
+      break;
+    }
+    case "enderman": {
+      rect(6, 0, 4, 4, "#111");
+      rect(4, 4, 8, 10, "#1a1a1a");
+      rect(2, 4, 2, 12, "#1a1a1a");
+      rect(12, 4, 2, 12, "#1a1a1a");
+      rect(4, 14, 4, 5, "#111");
+      rect(8, 14, 4, 5, "#111");
+      rect(7, 1, 1, 2, e); rect(9, 1, 1, 2, e);
+      break;
+    }
+    case "witch": {
+      // hat
+      rect(6, 0, 4, 2, "#2a0050"); rect(5, 2, 6, 1, "#2a0050");
+      rect(5, 3, 6, 5, "#9966cc"); // face
+      rect(5, 8, 6, 7, "#2a0050"); // robe
+      rect(3, 8, 2, 5, "#2a0050"); rect(11, 8, 2, 5, "#2a0050"); // arms
+      rect(5, 15, 3, 4, "#2a0050"); rect(8, 15, 3, 4, "#2a0050");
+      rect(6, 4, 1, 2, e); rect(9, 4, 1, 2, e);
+      break;
+    }
+    case "blaze": {
+      rect(5, 2, 6, 6, c);
+      // flame rods
+      for (let i = 0; i < 4; i++) {
+        rect(3, 2 + i * 3, 1, 5, "#ff6600");
+        rect(12, 1 + i * 3, 1, 5, "#ff8800");
+      }
+      rect(5, 8, 6, 6, "#ffaa00");
+      rect(6, 3, 2, 2, e); rect(9, 3, 2, 2, e);
+      break;
+    }
+    case "piglin": {
+      rect(5, 1, 6, 6, "#ff9999");
+      rect(5, 7, 6, 8, "#cc5555");
+      rect(3, 7, 2, 6, "#cc5555"); rect(11, 7, 2, 6, "#cc5555");
+      rect(5, 15, 3, 4, "#cc5555"); rect(8, 15, 3, 4, "#cc5555");
+      rect(5, 2, 2, 3, "#ffcccc"); rect(9, 2, 2, 3, "#ffcccc"); // ears
+      rect(6, 3, 2, 2, e); rect(9, 3, 2, 2, e);
+      rect(6, 5, 4, 1, "#ff4444"); // snout
+      break;
+    }
+    default: {
+      rect(5, 1, 6, 6, c);
+      rect(5, 7, 6, 8, c);
+      rect(5, 15, 3, 4, c); rect(8, 15, 3, 4, c);
+      rect(6, 3, 2, 2, e); rect(9, 3, 2, 2, e);
+    }
+  }
+}
+
+// ============================================================
+// GAME LOGIC
+// ============================================================
+function startGame() {
+  gameWords = [...WORD_LIST];
+  // shuffle all but last 10
+  const lastTen = gameWords.splice(gameWords.length - 10, 10);
+  shuffleArray(gameWords);
+  gameWords = [...gameWords, ...lastTen];
+
+  currentWordIndex = 0;
+  currentMonsterIndex = 0;
+  streak = 0;
+  monsterHP = 100;
+  maxHP = 100;
+  playerHP = 100;
+  isBoss = false;
+  bossActive = false;
+  totalCorrect = 0;
+  totalWrong = 0;
+  monstersDefeated = 0;
+  gameStarted = true;
+  inventory = {};
+  shieldCharges = 0;
+  nextDoubleDamage = false;
+
+  document.getElementById('title-screen').style.display = 'none';
+  document.getElementById('game-hud').style.display = 'flex';
+  document.getElementById('game-area').style.display = 'block';
+  document.getElementById('game-over-screen').style.display = 'none';
+
+  updateProgress();
+  updatePlayerHPBar();
+  updateItemPanel();
+  loadNextWord();
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function getCurrentMonsterConfig() {
+  if (isBoss) return BOSS;
+  return MONSTERS[currentMonsterIndex % MONSTERS.length];
+}
+
+function loadNextWord() {
+  if (currentWordIndex >= gameWords.length) {
+    // Check if we should trigger boss
+    if (isBoss) {
+      triggerVictory();
+      return;
+    }
+  }
+
+  // Trigger boss for last 10 words
+  const wordsLeft = gameWords.length - currentWordIndex;
+  if (!bossActive && wordsLeft <= 10) {
+    showBossWarning();
+    return;
+  }
+
+  const wordData = gameWords[currentWordIndex];
+  document.getElementById('word-meaning').textContent = `【${wordData.meaning}】`;
+  document.getElementById('word-hint').style.display = 'none';
+  document.getElementById('word-input').value = '';
+  document.getElementById('word-input').focus();
+
+  updateMonsterDisplay();
+  updateProgress();
+
+  // Auto-speak after short delay
+  setTimeout(() => speakCurrentWord(), 500);
+}
+
+function speakCurrentWord() {
+  const word = gameWords[currentWordIndex];
+  if (!word) return;
+  const utterance = new SpeechSynthesisUtterance(word.word);
+  utterance.lang = 'en-US';
+  utterance.rate = 0.85;
+  utterance.pitch = 1;
+  // Try to use a good English voice
+  const voices = speechSynthesis.getVoices();
+  const enVoice = voices.find(v => v.lang.startsWith('en-') && v.name.includes('Google'))
+    || voices.find(v => v.lang.startsWith('en-'))
+    || voices[0];
+  if (enVoice) utterance.voice = enVoice;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utterance);
+}
+
+function testSpeech() {
+  const utterance = new SpeechSynthesisUtterance("archaeology");
+  utterance.lang = 'en-US';
+  utterance.rate = 0.85;
+  const voices = speechSynthesis.getVoices();
+  const enVoice = voices.find(v => v.lang.startsWith('en-') && v.name.includes('Google'))
+    || voices.find(v => v.lang.startsWith('en-'));
+  if (enVoice) utterance.voice = enVoice;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utterance);
+}
+
+function submitWord() {
+  if (!gameStarted) return;
+  const input = document.getElementById('word-input').value.trim().toLowerCase();
+  const correct = gameWords[currentWordIndex].word.toLowerCase();
+
+  if (input === correct) {
+    handleCorrect();
+  } else {
+    handleWrong(input, correct);
+  }
+}
+
+function handleCorrect() {
+  totalCorrect++;
+  streak++;
+  updateStreakGems();
+
+  // Damage monster
+  let damage = isBoss ? 8 : 20;
+  if (nextDoubleDamage) {
+    damage *= 2;
+    nextDoubleDamage = false;
+  }
+  monsterHP = Math.max(0, monsterHP - damage);
+  updateHealthBar(true);
+
+  // Visual feedback
+  showBattleMsg(`✔ 正确！-${damage} HP`, 'correct');
+  spawnDamageFloat(`-${damage}`, '#5ce65c');
+  shakeMonster('hurt');
+
+  // Sword effect
+  showSwordEffect();
+
+  currentWordIndex++;
+  updateProgress();
+
+  // Check if boss killed
+  if (isBoss && monsterHP <= 0) {
+    setTimeout(() => triggerVictory(), 800);
+    return;
+  }
+
+  // Check streak or HP for normal monster defeat
+  if (!isBoss && (streak >= 5 || monsterHP <= 0)) {
+    streak = 0;
+    clearStreakGems();
+    setTimeout(() => {
+      defeatCurrentMonster();
+    }, 200);
+    return;
+  }
+
+  setTimeout(() => loadNextWord(), 600);
+}
+
+function handleWrong(input, correct) {
+  totalWrong++;
+  streak = Math.max(0, streak - 1);
+  updateStreakGems();
+
+  // Heal monster (wrong = monster gets stronger)
+  const heal = isBoss ? 5 : 15;
+  monsterHP = Math.min(maxHP, monsterHP + heal);
+  updateHealthBar(false);
+
+  if (shieldCharges > 0) {
+    shieldCharges--;
+    showBattleMsg(`🛡️ 拼错！护盾生效，抵挡了本次伤害。怪物+${heal}HP`, 'wrong');
+    spawnDamageFloat('BLOCK', '#88ddff');
+  } else {
+    playerHP = Math.max(0, playerHP - 10);
+    updatePlayerHPBar(false);
+    spawnPlayerFloat('-10', '#77ccff');
+    showBattleMsg(`✗ 错误！怪物+${heal}HP，你受到10点伤害`, 'wrong');
+    if (playerHP <= 0) {
+      triggerGameOver();
+      return;
+    }
+  }
+
+  // Show hint
+  document.getElementById('word-hint').style.display = 'block';
+  document.getElementById('word-hint').textContent = `✗ 正确答案: ${correct}`;
+
+  spawnDamageFloat(`+${heal}`, '#ff4444');
+  shakeMonster('heal');
+  updateItemPanel();
+
+  // Shake input
+  const inp = document.getElementById('word-input');
+  inp.classList.add('wrong-shake');
+  setTimeout(() => inp.classList.remove('wrong-shake'), 400);
+
+  // Still move to next word after delay
+  setTimeout(() => {
+    document.getElementById('word-hint').style.display = 'none';
+    loadNextWord();
+  }, 1800);
+}
+
+// ============================================================
+// BOSS SEQUENCE
+// ============================================================
+function showBossWarning() {
+  const warning = document.getElementById('boss-warning');
+  warning.style.display = 'flex';
+  // Play a dramatic announcement
+  const utt = new SpeechSynthesisUtterance("WARNING! The Ender Dragon appears!");
+  utt.lang = 'en-US';
+  utt.rate = 0.7;
+  utt.pitch = 0.5;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utt);
+
+  setTimeout(() => {
+    warning.style.display = 'none';
+    activateBoss();
+  }, 3500);
+}
+
+function activateBoss() {
+  isBoss = true;
+  bossActive = true;
+  maxHP = 100;
+  monsterHP = 100;
+  streak = 0;
+  clearStreakGems();
+
+  // Hide streak bar (boss doesn't use it)
+  document.getElementById('streak-bar').style.opacity = '0.3';
+  document.querySelector('[id^="streak-display"]').textContent = '';
+
+  // Update gem hint text
+  document.querySelector('.streak-gem')?.parentElement?.previousElementSibling &&
+    (document.querySelector('[style*="连击进度"]') ? null : null);
+
+  showBattleMsg('💀 大Boss出现！拼出全部10个单词消灭它！', 'info');
+  document.getElementById('monster-name').style.color = '#ff00ff';
+  document.getElementById('health-bar').style.background = 'linear-gradient(90deg, #aa00aa, #ff00ff)';
+
+  updateMonsterDisplay();
+  updateItemPanel();
+  loadNextWord();
+}
+
+function defeatCurrentMonster() {
+  monstersDefeated++;
+  currentMonsterIndex++;
+  monsterHP = 100;
+  maxHP = 100;
+  playerHP = Math.min(playerMaxHP, playerHP + 20);
+  updatePlayerHPBar(true);
+  const item = dropRandomItem();
+
+  flashDefeat();
+  setTimeout(() => {
+    showBattleMsg(`🎉 怪物被消灭！恢复20HP，获得${item.icon}${item.name}`, 'info');
+    updateMonsterDisplay();
+    loadNextWord();
+  }, 380);
+}
+
+function dropRandomItem() {
+  const item = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+  inventory[item.id] = (inventory[item.id] || 0) + 1;
+  updateItemPanel();
+  return item;
+}
+
+function useItem(itemId) {
+  if (!gameStarted || !inventory[itemId]) return;
+
+  const item = ITEMS.find(i => i.id === itemId);
+  if (!item) return;
+
+  inventory[itemId]--;
+  if (inventory[itemId] <= 0) delete inventory[itemId];
+
+  switch (itemId) {
+    case 'bread':
+      playerHP = Math.min(playerMaxHP, playerHP + 20);
+      updatePlayerHPBar(true);
+      showBattleMsg('🍞 使用面包：恢复20HP', 'info');
+      break;
+    case 'golden_apple':
+      playerHP = playerMaxHP;
+      updatePlayerHPBar(true);
+      showBattleMsg('🍎 使用金苹果：恢复满血', 'info');
+      break;
+    case 'diamond_armor':
+      shieldCharges++;
+      showBattleMsg('🛡️ 使用钻石盔甲：获得1层免伤护盾', 'info');
+      break;
+    case 'diamond_sword':
+      nextDoubleDamage = true;
+      showBattleMsg('🗡️ 使用钻石剑：下次正确拼写双倍伤害', 'info');
+      break;
+    case 'tnt':
+      monsterHP = Math.max(0, monsterHP - 50);
+      updateHealthBar(true);
+      spawnDamageFloat('-50', '#ffaa33');
+      showBattleMsg('💣 TNT爆炸：怪物-50HP', 'correct');
+      if (!isBoss && monsterHP <= 0) {
+        defeatCurrentMonster();
+      } else if (isBoss && monsterHP <= 0) {
+        triggerVictory();
+      }
+      break;
+    case 'enchanted_book': {
+      const w = gameWords[currentWordIndex]?.word || '';
+      if (w) {
+        document.getElementById('word-hint').style.display = 'block';
+        document.getElementById('word-hint').textContent = `📖 提示：首字母 ${w[0]}，长度 ${w.length}`;
+        showBattleMsg('📖 附魔书生效：已显示首字母提示', 'info');
+      }
+      break;
+    }
+    case 'speed_potion':
+      showBattleMsg('🧪 速度药水：跳过当前单词', 'info');
+      currentWordIndex++;
+      updateProgress();
+      setTimeout(() => loadNextWord(), 300);
+      break;
+    case 'ender_pearl': {
+      const w = gameWords[currentWordIndex]?.word || '';
+      if (w) {
+        document.getElementById('word-hint').style.display = 'block';
+        document.getElementById('word-hint').textContent = `🧲 单词显示：${w}`;
+        showBattleMsg('🧲 末影珍珠：完整单词显示3秒', 'info');
+        setTimeout(() => {
+          document.getElementById('word-hint').style.display = 'none';
+        }, 3000);
+      }
+      break;
+    }
+  }
+
+  updateItemPanel();
+}
+
+// ============================================================
+// UI UPDATES
+// ============================================================
+function updateMonsterDisplay() {
+  const m = getCurrentMonsterConfig();
+  document.getElementById('monster-name').textContent = m.name;
+  drawMonster(m.type, isBoss);
+  updateHealthBar(null); // just refresh without animation
+}
+
+function updateHealthBar(isHurt) {
+  const pct = (monsterHP / maxHP) * 100;
+  const bar = document.getElementById('health-bar');
+  bar.style.width = pct + '%';
+  document.getElementById('hp-text').textContent = `${monsterHP}/${maxHP}`;
+
+  if (isHurt === true) {
+    bar.classList.remove('healing');
+    bar.classList.add('hurt');
+    setTimeout(() => bar.classList.remove('hurt'), 600);
+  } else if (isHurt === false) {
+    bar.classList.remove('hurt');
+    bar.classList.add('healing');
+    setTimeout(() => bar.classList.remove('healing'), 600);
+  }
+}
+
+function updatePlayerHPBar(isHeal) {
+  const pct = (playerHP / playerMaxHP) * 100;
+  const bar = document.getElementById('player-hp-bar');
+  bar.style.width = pct + '%';
+  document.getElementById('player-hp-text').textContent = `${playerHP}/${playerMaxHP}`;
+
+  if (isHeal === true) {
+    bar.classList.remove('damage');
+    bar.classList.add('heal');
+    setTimeout(() => bar.classList.remove('heal'), 500);
+  } else if (isHeal === false) {
+    bar.classList.remove('heal');
+    bar.classList.add('damage');
+    setTimeout(() => bar.classList.remove('damage'), 500);
+  }
+}
+
+function updateItemPanel() {
+  const list = document.getElementById('item-list');
+  const effect = document.getElementById('effect-status');
+  const ownedIds = Object.keys(inventory);
+
+  if (!ownedIds.length) {
+    list.innerHTML = '<div class="item-empty">暂无道具</div>';
+  } else {
+    list.innerHTML = ownedIds.map(id => {
+      const item = ITEMS.find(i => i.id === id);
+      return `<button class="item-btn" onclick="useItem('${id}')">${item.icon} ${item.name} x${inventory[id]}</button>`;
+    }).join('');
+  }
+
+  const effects = [];
+  if (shieldCharges > 0) effects.push(`🛡️护盾:${shieldCharges}`);
+  if (nextDoubleDamage) effects.push('🗡️双倍伤害待命');
+  effect.textContent = effects.length ? `状态: ${effects.join(' | ')}` : '状态: 无';
+}
+
+function updateStreakGems() {
+  for (let i = 0; i < 5; i++) {
+    const gem = document.getElementById(`gem-${i}`);
+    if (i < streak) {
+      gem.classList.add('filled');
+    } else {
+      gem.classList.remove('filled');
+    }
+  }
+  document.getElementById('streak-display').textContent = `连击: ${streak}`;
+}
+
+function clearStreakGems() {
+  for (let i = 0; i < 5; i++) {
+    document.getElementById(`gem-${i}`).classList.remove('filled');
+  }
+}
+
+function updateProgress() {
+  const total = gameWords.length;
+  document.getElementById('word-progress').textContent = `单词: ${currentWordIndex}/${total}`;
+  document.getElementById('monster-counter').textContent = `怪物: ${monstersDefeated}`;
+}
+
+function showBattleMsg(text, type) {
+  const el = document.getElementById('battle-msg');
+  el.textContent = text;
+  el.className = type;
+}
+
+function shakeMonster(type) {
+  const canvas = document.getElementById('monster-canvas');
+  canvas.classList.remove('monster-hurt', 'monster-heal');
+  void canvas.offsetWidth;
+  canvas.classList.add(type === 'hurt' ? 'monster-hurt' : 'monster-heal');
+}
+
+function flashDefeat() {
+  const flash = document.getElementById('defeat-flash');
+  flash.style.opacity = '0.8';
+  setTimeout(() => flash.style.opacity = '0', 200);
+}
+
+function spawnDamageFloat(text, color) {
+  const el = document.createElement('div');
+  el.className = 'damage-float';
+  el.textContent = text;
+  el.style.color = color;
+  // Position near monster
+  const canvas = document.getElementById('monster-canvas');
+  const rect = canvas.getBoundingClientRect();
+  el.style.left = (rect.left + rect.width / 2 - 20) + 'px';
+  el.style.top = (rect.top + 20) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1600);
+}
+
+function spawnPlayerFloat(text, color) {
+  const el = document.createElement('div');
+  el.className = 'damage-float';
+  el.textContent = text;
+  el.style.color = color;
+  const bar = document.getElementById('player-hp-wrap');
+  const rect = bar.getBoundingClientRect();
+  el.style.left = (rect.left + rect.width / 2 - 20) + 'px';
+  el.style.top = (rect.top - 10) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1600);
+}
+
+function showSwordEffect() {
+  const el = document.createElement('div');
+  el.className = 'sword-effect';
+  el.textContent = '⚔️';
+  const canvas = document.getElementById('monster-canvas');
+  const rect = canvas.getBoundingClientRect();
+  el.style.left = (rect.left + rect.width / 2) + 'px';
+  el.style.top = (rect.top + rect.height / 2) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 700);
+}
+
+// ============================================================
+// VICTORY
+// ============================================================
+function triggerVictory() {
+  gameStarted = false;
+  const acc = totalCorrect + totalWrong > 0
+    ? Math.round((totalCorrect / (totalCorrect + totalWrong)) * 100) : 0;
+
+  document.getElementById('victory-stats').innerHTML = `
+    正确回答: ${totalCorrect} 个<br>
+    错误回答: ${totalWrong} 个<br>
+    正确率: ${acc}%<br>
+    消灭怪物: ${monstersDefeated} 只<br>
+    完成单词: ${gameWords.length} 个
+  `;
+
+  document.getElementById('victory-screen').style.display = 'flex';
+
+  // Victory speech
+  setTimeout(() => {
+    const utt = new SpeechSynthesisUtterance("Congratulations! You defeated the Ender Dragon! You are a spelling master!");
+    utt.lang = 'en-US';
+    utt.rate = 0.9;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utt);
+  }, 500);
+
+  // Fireworks
+  spawnFireworks();
+}
+
+function triggerGameOver() {
+  gameStarted = false;
+  document.getElementById('game-over-stats').innerHTML = `
+    你被怪物击败了<br>
+    正确回答: ${totalCorrect} 个<br>
+    错误回答: ${totalWrong} 个<br>
+    消灭怪物: ${monstersDefeated} 只<br>
+    已完成单词: ${currentWordIndex}/${gameWords.length}
+  `;
+  document.getElementById('game-over-screen').style.display = 'flex';
+}
+
+function applyAdaptiveLayout() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const ua = navigator.userAgent || '';
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod|HarmonyOS/i.test(ua) || w < 768;
+
+  let scale = 1;
+  if (isMobile) {
+    scale = Math.max(0.72, Math.min(0.92, w / 430));
+  } else {
+    if (w >= 2200) scale = 1.15;
+    else if (w >= 1600) scale = 1.05;
+    else if (w <= 1100) scale = 0.9;
+    if (h < 760) scale = Math.min(scale, 0.88);
+  }
+
+  document.documentElement.style.setProperty('--ui-scale', String(scale));
+  document.body.setAttribute('data-device', isMobile ? 'mobile' : 'desktop');
+  document.body.setAttribute('data-resolution', `${w}x${h}`);
+}
+
+function spawnFireworks() {
+  const colors = ['#ffd700', '#ff4444', '#5ce65c', '#4488ff', '#ff88ff'];
+  for (let i = 0; i < 20; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'damage-float';
+      el.textContent = ['✨', '🌟', '💥', '🎆', '⭐'][Math.floor(Math.random() * 5)];
+      el.style.color = colors[Math.floor(Math.random() * colors.length)];
+      el.style.left = Math.random() * window.innerWidth + 'px';
+      el.style.top = Math.random() * window.innerHeight * 0.8 + 'px';
+      el.style.fontSize = (1 + Math.random() * 2) + 'em';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1600);
+    }, i * 150);
+  }
+}
+
+function restartGame() {
+  document.getElementById('victory-screen').style.display = 'none';
+  document.getElementById('game-over-screen').style.display = 'none';
+  document.getElementById('game-hud').style.display = 'none';
+  document.getElementById('game-area').style.display = 'none';
+  document.getElementById('health-bar').style.background = 'linear-gradient(90deg, #ff0000, #ff6600)';
+  document.getElementById('monster-name').style.color = '#ff4444';
+  document.getElementById('streak-bar').style.opacity = '1';
+  document.getElementById('title-screen').style.display = 'flex';
+}
+
+// Load voices on page ready
+window.addEventListener('load', () => {
+  speechSynthesis.getVoices();
+  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+  applyAdaptiveLayout();
+  updatePlayerHPBar();
+  updateItemPanel();
+});
+
+window.addEventListener('resize', applyAdaptiveLayout);
+</script>
+</body>
+</html>
