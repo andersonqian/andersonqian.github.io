@@ -1,350 +1,394 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>我的像素世界 | 个人主页</title>
-  <style>
-    :root {
-      --bg-night: #0f1723;
-      --bg-dirt: #4a3a2f;
-      --bg-grass: #5d9b44;
-      --card: #2b2f3a;
-      --card-2: #343a46;
-      --text: #f8f3dc;
-      --muted: #c8c0a4;
-      --accent: #f7c54a;
-      --link: #78d8ff;
-      --border-dark: #1a1d25;
-      --border-light: #606879;
-      --success: #73d05a;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeff | 个人主页</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f2ede3;
+    --ink: #13232f;
+    --panel: #fff8eb;
+    --deep: #0c3d57;
+    --accent: #ff7a2f;
+    --accent-2: #2f9c95;
+    --line: #d8c8b0;
+    --shadow: 0 12px 30px rgba(12, 61, 87, 0.15);
+  }
 
-    * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html { scroll-behavior: smooth; }
+  body {
+    min-height: 100vh;
+    font-family: "Outfit", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 12% 14%, rgba(47, 156, 149, 0.16), transparent 42%),
+      radial-gradient(circle at 86% 84%, rgba(255, 122, 47, 0.16), transparent 40%),
+      linear-gradient(135deg, #efe6d7 0%, #f9f4ea 52%, #f3ebde 100%);
+    overflow-x: hidden;
+  }
 
-    body {
-      margin: 0;
-      font-family: "Courier New", "Consolas", monospace;
-      color: var(--text);
-      background:
-        linear-gradient(to bottom, rgba(93,155,68,.8) 0 60px, rgba(74,58,47,.92) 60px 120px) 0 100%/100% 120px no-repeat,
-        radial-gradient(2px 2px at 20% 20%, #ffffff88 40%, transparent 41%),
-        radial-gradient(2px 2px at 70% 35%, #ffffff66 40%, transparent 41%),
-        radial-gradient(1px 1px at 40% 60%, #ffffff88 40%, transparent 41%),
-        radial-gradient(1px 1px at 85% 15%, #ffffff66 40%, transparent 41%),
-        linear-gradient(180deg, #1c2740 0%, #101827 35%, #0b121d 100%);
-      min-height: 100vh;
-      line-height: 1.6;
-    }
+  .texture {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.15;
+    background-image: linear-gradient(transparent 97%, rgba(0,0,0,0.08) 100%);
+    background-size: 100% 4px;
+  }
 
-    .wrapper {
-      width: min(1100px, 94vw);
-      margin: 0 auto;
-      padding: 18px 0 56px;
-    }
+  .shell {
+    width: min(1180px, 92vw);
+    margin: 28px auto;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: rgba(255, 248, 235, 0.88);
+    backdrop-filter: blur(5px);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    animation: riseIn 0.8s ease;
+  }
 
-    .pixel-border {
-      border: 4px solid var(--border-dark);
-      box-shadow:
-        inset -3px -3px 0 0 #00000066,
-        inset 3px 3px 0 0 #ffffff1f,
-        0 0 0 3px var(--border-light);
-      image-rendering: pixelated;
-    }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(90deg, rgba(12, 61, 87, 0.08), transparent 68%);
+  }
 
-    header {
-      background: linear-gradient(180deg, #313844, #272d38);
-      padding: 14px 16px;
-      margin-bottom: 14px;
-    }
+  .brand {
+    font-family: "ZCOOL XiaoWei", serif;
+    letter-spacing: 1px;
+    font-size: 1.35rem;
+    color: var(--deep);
+  }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+  nav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
 
-    .logo {
-      font-weight: 700;
-      letter-spacing: 1px;
-      color: var(--accent);
-      font-size: clamp(1.05rem, 2vw, 1.4rem);
-      text-shadow: 2px 2px 0 #000;
-    }
+  .chip {
+    text-decoration: none;
+    color: var(--deep);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    background: #fff;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
 
-    nav ul {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+  .chip:hover {
+    transform: translateY(-2px);
+    background: #fff3df;
+  }
 
-    nav a {
-      display: inline-block;
-      text-decoration: none;
-      color: var(--text);
-      background: #3d4451;
-      padding: 6px 10px;
-      border: 2px solid #181c24;
-      box-shadow: inset 2px 2px 0 #ffffff1f;
-      font-size: .92rem;
-    }
+  .grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 74vh;
+  }
 
-    nav a:hover { background: #4a5260; }
-    nav a:focus-visible,
-    .btn:focus-visible,
-    .project a:focus-visible {
-      outline: 3px dashed var(--accent);
-      outline-offset: 2px;
-    }
+  aside {
+    border-right: 1px solid var(--line);
+    padding: 24px;
+    background: linear-gradient(180deg, rgba(47, 156, 149, 0.08), transparent 60%);
+  }
 
-    .hero {
-      background: linear-gradient(180deg, #2a303c, #242a35);
-      padding: 18px;
-      margin-bottom: 14px;
-      display: grid;
-      grid-template-columns: 92px 1fr;
-      gap: 14px;
-      align-items: center;
-    }
+  .avatar {
+    width: 112px;
+    height: 112px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    font-size: 2.1rem;
+    color: #fff;
+    margin-bottom: 16px;
+    background: linear-gradient(150deg, var(--deep), var(--accent-2));
+    box-shadow: 0 10px 20px rgba(12, 61, 87, 0.25);
+  }
 
-    .avatar {
-      width: 92px;
-      aspect-ratio: 1;
-      background:
-        linear-gradient(90deg, #6c4a2f 0 50%, #7b5636 50% 100%),
-        linear-gradient(180deg, #d2a378 0 55%, #91664b 55% 100%);
-      border: 3px solid #1b1e25;
-      box-shadow: 0 0 0 3px #5a6373;
-      position: relative;
-    }
+  .name {
+    font-family: "ZCOOL XiaoWei", serif;
+    font-size: 1.45rem;
+    color: var(--deep);
+  }
 
-    .avatar::before,
-    .avatar::after {
-      content: "";
-      position: absolute;
-      top: 30%;
-      width: 10px;
-      height: 10px;
-      background: #111;
-    }
-    .avatar::before { left: 22%; }
-    .avatar::after { right: 22%; }
+  .role {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: #35576a;
+    line-height: 1.5;
+  }
 
-    h1, h2, h3 { margin: 0 0 10px; line-height: 1.25; }
-    h1 { font-size: clamp(1.35rem, 3.5vw, 2rem); color: #fff8d9; }
-    h2 { font-size: clamp(1.1rem, 2.4vw, 1.4rem); color: #ffe08a; }
-    p { margin: 0 0 8px; color: var(--muted); }
+  .meta {
+    margin-top: 18px;
+    display: grid;
+    gap: 8px;
+    font-size: 0.92rem;
+    color: #35576a;
+  }
 
-    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-    .btn {
-      text-decoration: none;
-      color: #13200f;
-      background: var(--success);
-      border: 2px solid #1f3117;
-      box-shadow: inset 2px 2px 0 #b6ef9f;
-      padding: 7px 12px;
-      font-weight: 700;
-      font-size: .92rem;
-    }
-    .btn.secondary {
-      color: #e9f6ff;
-      background: #4f6689;
-      border-color: #1f2d43;
-      box-shadow: inset 2px 2px 0 #8ca5cb;
-    }
+  .meta span {
+    display: block;
+    padding: 8px 10px;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.7);
+  }
 
-    section {
-      background: linear-gradient(180deg, var(--card), var(--card-2));
-      padding: 16px;
-      margin-bottom: 14px;
-    }
+  main {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 16px;
+  }
 
-    .skills {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--panel);
+    box-shadow: 0 8px 20px rgba(12, 61, 87, 0.08);
+    padding: 18px;
+    animation: fadeUp 0.7s ease both;
+  }
 
-    .skill {
-      background: #222833;
-      border: 2px solid #161b22;
-      box-shadow: inset 2px 2px 0 #ffffff14;
-      padding: 10px;
-      font-size: .95rem;
-    }
+  .card h2 {
+    font-family: "ZCOOL XiaoWei", serif;
+    color: var(--deep);
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
 
-    .projects {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
+  .card p {
+    color: #2f4656;
+    line-height: 1.65;
+    font-size: 0.95rem;
+  }
 
-    .project {
-      background: #202733;
-      border: 2px solid #151922;
-      box-shadow: inset 2px 2px 0 #ffffff12;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .project h3 { color: #fff; font-size: 1rem; }
-    .project p { font-size: .92rem; }
-    .project a {
-      margin-top: auto;
-      color: var(--link);
-      font-weight: 700;
-      text-decoration-thickness: 2px;
-      text-underline-offset: 2px;
-    }
+  .hero {
+    grid-column: span 8;
+    background:
+      linear-gradient(120deg, rgba(47, 156, 149, 0.12), rgba(255, 122, 47, 0.12)),
+      var(--panel);
+  }
 
-    .contact-list {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .contact-item {
-      background: #212733;
-      border: 2px solid #171c25;
-      padding: 10px;
-      min-height: 78px;
-    }
-    .contact-item strong { color: #fff; display: block; margin-bottom: 6px; }
-    .contact-item a { color: var(--link); }
+  .hero h1 {
+    font-family: "ZCOOL XiaoWei", serif;
+    font-size: 2.1rem;
+    color: var(--deep);
+    margin-bottom: 10px;
+  }
 
-    footer {
-      text-align: center;
-      color: #9ca6b8;
-      font-size: .85rem;
-      padding-top: 4px;
-    }
+  .hero p {
+    max-width: 52ch;
+  }
 
-    @media (max-width: 840px) {
-      .skills,
-      .projects,
-      .contact-list { grid-template-columns: 1fr 1fr; }
-    }
+  .cta {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
 
-    @media (max-width: 560px) {
-      .hero { grid-template-columns: 1fr; }
-      .avatar { margin-inline: auto; }
-      .skills,
-      .projects,
-      .contact-list { grid-template-columns: 1fr; }
-      nav ul { gap: 6px; }
-      nav a { font-size: .86rem; padding: 5px 8px; }
-    }
-  </style>
+  .btn {
+    display: inline-block;
+    text-decoration: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 500;
+    font-size: 0.93rem;
+    transition: transform 0.2s ease;
+  }
+
+  .btn:hover { transform: translateY(-2px); }
+
+  .btn-main {
+    color: #fff;
+    background: linear-gradient(120deg, var(--deep), var(--accent-2));
+  }
+
+  .btn-sub {
+    color: var(--deep);
+    border: 1px solid var(--line);
+    background: #fff;
+  }
+
+  .skills { grid-column: span 4; }
+  .project { grid-column: span 7; }
+  .timeline { grid-column: span 5; }
+  .toefl { grid-column: 1 / -1; }
+
+  .skill-list {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .skill-list span {
+    padding: 7px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: #fff;
+    font-size: 0.85rem;
+  }
+
+  .timeline ul {
+    margin-top: 10px;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+
+  .timeline li {
+    padding: 10px;
+    border-left: 3px solid var(--accent-2);
+    background: #fff;
+    border-radius: 0 10px 10px 0;
+    font-size: 0.9rem;
+    color: #2f4656;
+  }
+
+  .game-wrap {
+    margin-top: 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+  }
+
+  iframe {
+    width: 100%;
+    height: 620px;
+    border: 0;
+    display: block;
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 14px 24px;
+    font-size: 0.85rem;
+    color: #486273;
+    background: rgba(12, 61, 87, 0.05);
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 980px) {
+    .grid { grid-template-columns: 1fr; }
+    aside { border-right: 0; border-bottom: 1px solid var(--line); }
+    .hero, .skills, .project, .timeline { grid-column: 1 / -1; }
+  }
+
+  @media (max-width: 640px) {
+    .shell { width: 95vw; margin: 14px auto; }
+    header, aside, main, footer { padding-left: 14px; padding-right: 14px; }
+    .hero h1 { font-size: 1.62rem; }
+    iframe { height: 500px; }
+  }
+</style>
 </head>
 <body>
-  <!--
-    快速编辑区（先改这里）：
-    1) 标题：h1 "我的像素世界"
-    2) 自我介绍：hero 中两段 p
-    3) 技能：#skills 下 .skill 文本
-    4) 项目：#projects 下每张 .project 卡片
-    5) 联系方式：#contact 下 GitHub / 邮箱 / 微信
-  -->
+<div class="texture" aria-hidden="true"></div>
 
-  <div class="wrapper">
-    <header class="pixel-border" aria-label="站点导航">
-      <div class="topbar">
-        <div class="logo" aria-label="站点名称">⛏ 我的像素世界</div>
-        <nav aria-label="主导航">
-          <ul>
-            <li><a href="#about">关于我</a></li>
-            <li><a href="#skills">技能树</a></li>
-            <li><a href="#projects">像素游戏</a></li>
-            <li><a href="#contact">联系我</a></li>
-          </ul>
-        </nav>
+<div class="shell">
+  <header>
+    <div class="brand">Jeff Portfolio</div>
+    <nav>
+      <a class="chip" href="#about">关于我</a>
+      <a class="chip" href="#projects">项目</a>
+      <a class="chip" href="#toefl">托福单词</a>
+      <a class="chip" href="#contact">联系</a>
+    </nav>
+  </header>
+
+  <div class="grid">
+    <aside id="about">
+      <div class="avatar">J</div>
+      <div class="name">Jeff</div>
+      <div class="role">学习者 / 创作者 / 前端爱好者</div>
+      <div class="meta">
+        <span>📍 China</span>
+        <span>🎯 Focus: AI + Learning Tools</span>
+        <span>⚡ Motto: Build and Share</span>
       </div>
-    </header>
+    </aside>
 
     <main>
-      <section id="about" class="hero pixel-border" aria-labelledby="about-title">
-        <div class="avatar" aria-hidden="true"></div>
-        <div>
-          <h1 id="about-title">你好，我是 Aqian 👋</h1>
-          <p>
-            我是一名热爱技术与设计的开发者，喜欢把复杂问题拆成可落地的小方块。
-          </p>
-          <p>
-            当前聚焦：AI 工具链、自动化工作流、可视化内容生成。
-          </p>
-          <div class="btn-row">
-            <a class="btn" href="#projects">查看项目</a>
-            <a class="btn secondary" href="#contact">发起联系</a>
-          </div>
+      <section class="card hero" style="animation-delay:0.04s">
+        <h1>你好，我是 Jeff</h1>
+        <p>
+          这是我的个人主页。我把学习内容、实战项目和互动练习整合在同一个入口，方便快速浏览与演示。
+          页面结构参考图1，视觉语言参考图2，整体采用温暖纸感底色 + 现代信息卡片风格。
+        </p>
+        <div class="cta">
+          <a class="btn btn-main" href="#toefl">开始托福单词挑战</a>
+          <a class="btn btn-sub" href="#projects">查看项目列表</a>
         </div>
       </section>
 
-      <section id="skills" class="pixel-border" aria-labelledby="skills-title">
-        <h2 id="skills-title">🧱 技能树</h2>
-        <div class="skills">
-          <article class="skill">Python / 自动化脚本</article>
-          <article class="skill">HTML / CSS / 前端交互</article>
-          <article class="skill">AI Agent 工作流设计</article>
-          <article class="skill">PPT / 报告生成自动化</article>
-          <article class="skill">数据整理与可视化</article>
-          <article class="skill">工程化与效率优化</article>
+      <section class="card skills" style="animation-delay:0.1s">
+        <h2>技能标签</h2>
+        <div class="skill-list">
+          <span>HTML/CSS</span>
+          <span>JavaScript</span>
+          <span>UI Design</span>
+          <span>Prompting</span>
+          <span>Learning App</span>
+          <span>Game UX</span>
         </div>
       </section>
 
-      <section id="projects" class="pixel-border" aria-labelledby="projects-title">
-        <h2 id="projects-title">🗺 像素游戏</h2>
-        <div class="projects">
-          <article class="project">
-            <h3>项目 01：无限资源</h3>
-            <p>英语单词拼写大冒险：听发音、拼单词、打怪升级的像素风小游戏。</p>
-            <a href="无限资源.html" aria-label="查看项目 01 无限资源">查看详情 →</a>
-          </article>
-          <article class="project">
-            <h3>项目 02：个人知识检索助手</h3>
-            <p>聚合邮件、文档与会议记录，支持语义搜索与快速总结。</p>
-            <a href="#" aria-label="查看项目 02">查看详情 →</a>
-          </article>
-          <article class="project">
-            <h3>项目 03：自动化报告工厂</h3>
-            <p>将原始数据转为图表、结论与行动建议，缩短汇报准备周期。</p>
-            <a href="#" aria-label="查看项目 03">查看详情 →</a>
-          </article>
+      <section class="card project" id="projects" style="animation-delay:0.16s">
+        <h2>代表项目</h2>
+        <p>
+          <strong>无限资源之托福单词：</strong>把单词记忆做成了像素战斗游戏，结合语音播放、拼写输入、怪物血条、道具掉落和 Boss 机制，提升记忆参与感。
+        </p>
+        <div class="cta">
+          <a class="btn btn-main" href="./无限资源之托福单词.html" target="_blank" rel="noopener noreferrer">新窗口打开完整游戏</a>
         </div>
       </section>
 
-      <section id="contact" class="pixel-border" aria-labelledby="contact-title">
-        <h2 id="contact-title">📮 联系我</h2>
-        <div class="contact-list">
-          <article class="contact-item">
-            <strong>GitHub</strong>
-            <a href="https://github.com/yourname" target="_blank" rel="noopener noreferrer">github.com/yourname</a>
-          </article>
-          <article class="contact-item">
-            <strong>邮箱</strong>
-            <a href="mailto:yourname@example.com">yourname@example.com</a>
-          </article>
-          <article class="contact-item">
-            <strong>微信</strong>
-            <span>your_wechat_id</span>
-          </article>
+      <section class="card timeline" style="animation-delay:0.22s">
+        <h2>近期动态</h2>
+        <ul>
+          <li>完成个人主页框架搭建与样式统一</li>
+          <li>接入托福单词游戏作为核心互动模块</li>
+          <li>优化移动端布局与按钮触控体验</li>
+        </ul>
+      </section>
+
+      <section class="card toefl" id="toefl" style="animation-delay:0.28s">
+        <h2>无限资源之托福单词</h2>
+        <p>按你的要求，主页直接复用并嵌入 <code>无限资源之托福单词.html</code>，可在此预览并开始练习。</p>
+        <div class="game-wrap">
+          <iframe title="无限资源之托福单词" src="./无限资源之托福单词.html" loading="lazy"></iframe>
         </div>
       </section>
     </main>
-
-    <footer>
-      © <span id="year"></span> Aqian · Crafted in a Minecraft-style world.
-    </footer>
   </div>
 
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+  <footer id="contact">
+    Contact: jeff@example.com · GitHub: github.com/jeff · Built with passion.
+  </footer>
+</div>
 </body>
 </html>
