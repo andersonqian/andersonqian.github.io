@@ -1,394 +1,73 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jeff | 个人主页</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #f2ede3;
-    --ink: #13232f;
-    --panel: #fff8eb;
-    --deep: #0c3d57;
-    --accent: #ff7a2f;
-    --accent-2: #2f9c95;
-    --line: #d8c8b0;
-    --shadow: 0 12px 30px rgba(12, 61, 87, 0.15);
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    min-height: 100vh;
-    font-family: "Outfit", "PingFang SC", "Microsoft YaHei", sans-serif;
-    color: var(--ink);
-    background:
-      radial-gradient(circle at 12% 14%, rgba(47, 156, 149, 0.16), transparent 42%),
-      radial-gradient(circle at 86% 84%, rgba(255, 122, 47, 0.16), transparent 40%),
-      linear-gradient(135deg, #efe6d7 0%, #f9f4ea 52%, #f3ebde 100%);
-    overflow-x: hidden;
-  }
-
-  .texture {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.15;
-    background-image: linear-gradient(transparent 97%, rgba(0,0,0,0.08) 100%);
-    background-size: 100% 4px;
-  }
-
-  .shell {
-    width: min(1180px, 92vw);
-    margin: 28px auto;
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    background: rgba(255, 248, 235, 0.88);
-    backdrop-filter: blur(5px);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    animation: riseIn 0.8s ease;
-  }
-
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 18px 24px;
-    border-bottom: 1px solid var(--line);
-    background: linear-gradient(90deg, rgba(12, 61, 87, 0.08), transparent 68%);
-  }
-
-  .brand {
-    font-family: "ZCOOL XiaoWei", serif;
-    letter-spacing: 1px;
-    font-size: 1.35rem;
-    color: var(--deep);
-  }
-
-  nav {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .chip {
-    text-decoration: none;
-    color: var(--deep);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 8px 14px;
-    font-size: 0.88rem;
-    background: #fff;
-    transition: transform 0.2s ease, background 0.2s ease;
-  }
-
-  .chip:hover {
-    transform: translateY(-2px);
-    background: #fff3df;
-  }
-
-  .grid {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    min-height: 74vh;
-  }
-
-  aside {
-    border-right: 1px solid var(--line);
-    padding: 24px;
-    background: linear-gradient(180deg, rgba(47, 156, 149, 0.08), transparent 60%);
-  }
-
-  .avatar {
-    width: 112px;
-    height: 112px;
-    border-radius: 18px;
-    display: grid;
-    place-items: center;
-    font-size: 2.1rem;
-    color: #fff;
-    margin-bottom: 16px;
-    background: linear-gradient(150deg, var(--deep), var(--accent-2));
-    box-shadow: 0 10px 20px rgba(12, 61, 87, 0.25);
-  }
-
-  .name {
-    font-family: "ZCOOL XiaoWei", serif;
-    font-size: 1.45rem;
-    color: var(--deep);
-  }
-
-  .role {
-    margin-top: 8px;
-    font-size: 0.95rem;
-    color: #35576a;
-    line-height: 1.5;
-  }
-
-  .meta {
-    margin-top: 18px;
-    display: grid;
-    gap: 8px;
-    font-size: 0.92rem;
-    color: #35576a;
-  }
-
-  .meta span {
-    display: block;
-    padding: 8px 10px;
-    border: 1px dashed var(--line);
-    border-radius: 10px;
-    background: rgba(255,255,255,0.7);
-  }
-
-  main {
-    padding: 24px;
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 16px;
-  }
-
-  .card {
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: var(--panel);
-    box-shadow: 0 8px 20px rgba(12, 61, 87, 0.08);
-    padding: 18px;
-    animation: fadeUp 0.7s ease both;
-  }
-
-  .card h2 {
-    font-family: "ZCOOL XiaoWei", serif;
-    color: var(--deep);
-    font-size: 1.2rem;
-    margin-bottom: 8px;
-  }
-
-  .card p {
-    color: #2f4656;
-    line-height: 1.65;
-    font-size: 0.95rem;
-  }
-
-  .hero {
-    grid-column: span 8;
-    background:
-      linear-gradient(120deg, rgba(47, 156, 149, 0.12), rgba(255, 122, 47, 0.12)),
-      var(--panel);
-  }
-
-  .hero h1 {
-    font-family: "ZCOOL XiaoWei", serif;
-    font-size: 2.1rem;
-    color: var(--deep);
-    margin-bottom: 10px;
-  }
-
-  .hero p {
-    max-width: 52ch;
-  }
-
-  .cta {
-    margin-top: 14px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    display: inline-block;
-    text-decoration: none;
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-weight: 500;
-    font-size: 0.93rem;
-    transition: transform 0.2s ease;
-  }
-
-  .btn:hover { transform: translateY(-2px); }
-
-  .btn-main {
-    color: #fff;
-    background: linear-gradient(120deg, var(--deep), var(--accent-2));
-  }
-
-  .btn-sub {
-    color: var(--deep);
-    border: 1px solid var(--line);
-    background: #fff;
-  }
-
-  .skills { grid-column: span 4; }
-  .project { grid-column: span 7; }
-  .timeline { grid-column: span 5; }
-  .toefl { grid-column: 1 / -1; }
-
-  .skill-list {
-    margin-top: 10px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .skill-list span {
-    padding: 7px 10px;
-    border-radius: 999px;
-    border: 1px solid var(--line);
-    background: #fff;
-    font-size: 0.85rem;
-  }
-
-  .timeline ul {
-    margin-top: 10px;
-    list-style: none;
-    display: grid;
-    gap: 10px;
-  }
-
-  .timeline li {
-    padding: 10px;
-    border-left: 3px solid var(--accent-2);
-    background: #fff;
-    border-radius: 0 10px 10px 0;
-    font-size: 0.9rem;
-    color: #2f4656;
-  }
-
-  .game-wrap {
-    margin-top: 12px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    overflow: hidden;
-    background: #ffffff;
-  }
-
-  iframe {
-    width: 100%;
-    height: 620px;
-    border: 0;
-    display: block;
-  }
-
-  footer {
-    border-top: 1px solid var(--line);
-    padding: 14px 24px;
-    font-size: 0.85rem;
-    color: #486273;
-    background: rgba(12, 61, 87, 0.05);
-  }
-
-  @keyframes riseIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @media (max-width: 980px) {
-    .grid { grid-template-columns: 1fr; }
-    aside { border-right: 0; border-bottom: 1px solid var(--line); }
-    .hero, .skills, .project, .timeline { grid-column: 1 / -1; }
-  }
-
-  @media (max-width: 640px) {
-    .shell { width: 95vw; margin: 14px auto; }
-    header, aside, main, footer { padding-left: 14px; padding-right: 14px; }
-    .hero h1 { font-size: 1.62rem; }
-    iframe { height: 500px; }
-  }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>学科的简介｜核心逻辑与要点</title>
+  <style>
+    :root{--blue:#3070E7;--navy:#07182D;--dark:#0F1729;--teal:#16BDEB;--green:#22C55E;--orange:#FF9000;--gray:#64748B;--muted:#94A3B8;--light:#F8FAFC;--white:#fff;--line:#DCE5EF;--nav:272px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--light);color:var(--dark);font-family:'CiscoSans','Helvetica Neue',-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;line-height:1.7}
+    aside{position:fixed;inset:0 auto 0 0;width:var(--nav);padding:30px 22px;background:linear-gradient(165deg,var(--dark),var(--navy));color:var(--white);overflow:auto}
+    .brand{font-size:18px;font-weight:600;letter-spacing:.02em}.brand span{color:var(--teal)}.nav-note{margin:8px 0 24px;color:#C4D1E1;font-size:12px}.nav-title{margin:20px 10px 8px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
+    nav a{display:block;margin:2px 0;padding:8px 10px;border-left:3px solid transparent;border-radius:4px;color:#DDE8F5;text-decoration:none;font-size:13px;transition:.2s}nav a:hover,nav a:focus{border-color:var(--teal);background:rgba(255,255,255,.08);color:var(--white)}
+    main{margin-left:var(--nav);padding:42px}.wrap{max-width:1180px;margin:auto}.hero{position:relative;overflow:hidden;padding:44px;border-radius:16px;background:var(--dark);color:var(--white);box-shadow:0 14px 36px rgba(15,23,41,.16)}.hero:after{content:"";position:absolute;right:-70px;top:-100px;width:290px;height:290px;border:54px solid rgba(22,189,235,.14);border-radius:50%}.eyebrow{color:var(--teal);font-size:13px;font-weight:700;letter-spacing:.14em}.hero h1{max-width:780px;margin:10px 0 14px;font-size:38px;line-height:1.2;font-weight:400}.hero p{max-width:850px;margin:0;color:#D5E1EF;font-size:17px}
+    section{margin-top:24px;padding:30px;background:var(--white);border:1px solid var(--line);border-radius:13px;box-shadow:0 5px 18px rgba(7,24,45,.06);scroll-margin-top:18px}h2{margin:0 0 20px;font-size:24px;font-weight:500}h2:after{content:"";display:block;width:48px;height:3px;margin-top:9px;background:var(--blue);border-radius:3px}h3{margin:0 0 8px;font-size:17px}p{margin:7px 0 14px}.lead{font-size:20px;line-height:1.55;color:var(--navy)}
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;counter-reset:step}.step{position:relative;min-height:150px;padding:20px 16px;border-top:4px solid var(--blue);border-radius:8px;background:var(--light)}.step:before{counter-increment:step;content:counter(step);display:grid;place-items:center;width:28px;height:28px;margin-bottom:13px;border-radius:50%;background:var(--blue);color:white;font-weight:700}.step:not(:last-child):after{content:"›";position:absolute;right:-11px;top:57px;z-index:2;color:var(--blue);font-size:26px;font-weight:700}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{padding:20px;border:1px solid var(--line);border-radius:10px;background:#fff}.card.blue{border-top:4px solid var(--blue)}.card.teal{border-top:4px solid var(--teal)}.card.green{border-top:4px solid var(--green)}ul{margin:8px 0;padding-left:21px}li{margin:6px 0}
+    .equation{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:20px 0}.pill{padding:12px 16px;border-radius:999px;background:#EAF1FD;color:#17488F;font-weight:600}.op{color:var(--gray);font-size:22px}.callout{margin-top:18px;padding:18px 20px;border-left:4px solid var(--orange);border-radius:6px;background:#FFF8EC}.callout.info{border-color:var(--blue);background:#F0F5FE}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.metric{padding:20px;border-radius:9px;background:var(--navy);color:white}.metric b{display:block;margin-bottom:7px;color:var(--teal);font-size:18px}
+    .checklist{columns:2;column-gap:32px}.checklist li{break-inside:avoid;list-style:none;position:relative;padding:9px 0 9px 31px;border-bottom:1px solid var(--line)}.checklist li:before{content:"✓";position:absolute;left:3px;color:var(--green);font-weight:800}.risk li::marker{color:var(--orange)}
+    .note{margin-top:26px;padding:16px 20px;border-radius:8px;background:#EEF2F6;color:#46566A;font-size:13px}.footer{padding:28px 4px;color:var(--gray);font-size:12px;text-align:right}
+    @media(max-width:980px){aside{position:relative;width:auto}.nav-title,nav{display:none}main{margin:0;padding:24px}.flow{grid-template-columns:1fr 1fr}.step:not(:last-child):after{display:none}.grid{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}}
+    @media(max-width:600px){main{padding:14px}.hero,section{padding:22px}.hero h1{font-size:29px}.flow,.metrics{grid-template-columns:1fr}.checklist{columns:1}}
+    @media print{aside{display:none}main{margin:0;padding:0}.hero,section{box-shadow:none;break-inside:avoid}.hero{background:var(--dark)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  </style>
 </head>
 <body>
-<div class="texture" aria-hidden="true"></div>
-
-<div class="shell">
-  <header>
-    <div class="brand">Jeff Portfolio</div>
+  <aside aria-label="页面目录">
+    <div class="brand">Cisco <span>|</span> 学科发展规划摘要</div>
+    <div class="nav-note">基于《学科的简介》内容提炼</div>
+    <div class="nav-title">目录</div>
     <nav>
-      <a class="chip" href="#about">关于我</a>
-      <a class="chip" href="#projects">项目</a>
-      <a class="chip" href="#toefl">托福单词</a>
-      <a class="chip" href="#contact">联系</a>
+      <a href="#core">核心结论</a><a href="#logic">核心逻辑链</a><a href="#paths">方向差异</a><a href="#competition">竞赛定位</a><a href="#leadership">领导力与社会贡献</a><a href="#global">全球视野</a><a href="#actions">行动清单</a><a href="#risks">风险与误区</a><a href="#summary">最终总结</a>
     </nav>
-  </header>
+  </aside>
+  <main><div class="wrap">
+    <header class="hero"><div class="eyebrow">CORE LOGIC & KEY TAKEAWAYS</div><h1>学科的简介：核心逻辑与要点</h1><p>重点不是堆砌活动或奖项，而是在较早阶段识别学生的真实兴趣与能力，并以长期、匹配、可持续的路径形成学术深度、社会影响和鲜明的个人特质。</p></header>
 
-  <div class="grid">
-    <aside id="about">
-      <div class="avatar">J</div>
-      <div class="name">Jeff</div>
-      <div class="role">学习者 / 创作者 / 前端爱好者</div>
-      <div class="meta">
-        <span>📍 China</span>
-        <span>🎯 Focus: AI + Learning Tools</span>
-        <span>⚡ Motto: Build and Share</span>
-      </div>
-    </aside>
+    <section id="core"><h2>一句话核心结论</h2><p class="lead">6–8年级的核心任务是<strong>探索、打基础、识别天赋并验证方向</strong>；9年级以后再围绕已确认的方向做深、做久、做出真实成果，而不是临时“包装”。</p><div class="callout info"><strong>贯穿全文的判断原则：</strong>规划必须以学生的天赋、兴趣、可承受节奏、学校资源和目标层级为依据；不存在适用于所有人的固定模板。</div></section>
 
-    <main>
-      <section class="card hero" style="animation-delay:0.04s">
-        <h1>你好，我是 Jeff</h1>
-        <p>
-          这是我的个人主页。我把学习内容、实战项目和互动练习整合在同一个入口，方便快速浏览与演示。
-          页面结构参考图1，视觉语言参考图2，整体采用温暖纸感底色 + 现代信息卡片风格。
-        </p>
-        <div class="cta">
-          <a class="btn btn-main" href="#toefl">开始托福单词挑战</a>
-          <a class="btn btn-sub" href="#projects">查看项目列表</a>
-        </div>
-      </section>
+    <section id="logic"><h2>核心逻辑链</h2><div class="flow">
+      <div class="step"><h3>广泛探索</h3><p>接触学科、阅读、社会活动和兴趣项目，理解“学科究竟是什么”。</p></div>
+      <div class="step"><h3>识别优势</h3><p>观察兴趣能否持续、能力是否突出，以及学生真正适合的节奏。</p></div>
+      <div class="step"><h3>匹配路径</h3><p>结合课程、竞赛资格、学校平台、教练与家庭资源进行选择。</p></div>
+      <div class="step"><h3>纵向深化</h3><p>9年级后聚焦少数方向，形成知识深度、成果、职位或持续影响。</p></div>
+      <div class="step"><h3>形成证据</h3><p>以学术实力、领导力、社会贡献和个人特质构成完整画像。</p></div>
+    </div></section>
 
-      <section class="card skills" style="animation-delay:0.1s">
-        <h2>技能标签</h2>
-        <div class="skill-list">
-          <span>HTML/CSS</span>
-          <span>JavaScript</span>
-          <span>UI Design</span>
-          <span>Prompting</span>
-          <span>Learning App</span>
-          <span>Game UX</span>
-        </div>
-      </section>
+    <section id="paths"><h2>不同方向的培养重点</h2><div class="grid">
+      <article class="card blue"><h3>理科与竞赛方向</h3><ul><li>先夯实数理基础，再决定是否进入高强度竞赛。</li><li>课程进度取决于天赋与吸收能力，不能机械超前。</li><li>提前核实参赛资格、学校资源与选拔路径。</li><li>竞赛之外仍需科研、学科贡献、阅读写作与综合能力。</li></ul></article>
+      <article class="card teal"><h3>人文方向</h3><ul><li>6–8年级进行广泛而有体系的阅读。</li><li>历史、哲学、人类学等多学科视角有助于建立深度。</li><li>从泛读中发现具体兴趣，9年级后再聚焦专题。</li><li>重视批判性阅读、写作与多元观点表达。</li></ul></article>
+      <article class="card green"><h3>体育与个人兴趣</h3><ul><li>早期判断是职业路径、升学路径，还是长期爱好。</li><li>体育即使不走专业，也可体现坚持、抗压与韧性。</li><li>兴趣不局限于音体美，小众爱好也能成为个人标签。</li><li>不必把每个爱好都做到极致，应结合时间与资源取舍。</li></ul></article>
+    </div></section>
 
-      <section class="card project" id="projects" style="animation-delay:0.16s">
-        <h2>代表项目</h2>
-        <p>
-          <strong>无限资源之托福单词：</strong>把单词记忆做成了像素战斗游戏，结合语音播放、拼写输入、怪物血条、道具掉落和 Boss 机制，提升记忆参与感。
-        </p>
-        <div class="cta">
-          <a class="btn btn-main" href="./无限资源之托福单词.html" target="_blank" rel="noopener noreferrer">新窗口打开完整游戏</a>
-        </div>
-      </section>
+    <section id="competition"><h2>竞赛的正确定位</h2><div class="equation"><span class="pill">1–2项高质量竞赛</span><span class="op">＋</span><span class="pill">科研／学科贡献</span><span class="op">＋</span><span class="pill">阅读写作与人文思维</span><span class="op">＋</span><span class="pill">领导力与个人特质</span></div><ul><li><strong>竞赛是能力证据，不是录取结果。</strong>它能够证明学科实力，但不能替代完整的学生画像。</li><li><strong>质量优先于数量。</strong>原文主张，与其形成“全竞赛列表”，不如在少数高价值项目中取得真正成果。</li><li><strong>项目层级须匹配目标。</strong>低含金量奖项对不同目标学校的作用可能不同，不能统一判断。</li><li><strong>节奏必须服从天赋。</strong>先保证基础扎实，再在学生能消化的范围内加速；不要为了进度牺牲理解。</li></ul><div class="callout"><strong>提醒：</strong>文中关于年级进度、竞赛层级和录取结果的表述主要源于讲者经验，不应视为普遍保证或硬性标准。</div></section>
 
-      <section class="card timeline" style="animation-delay:0.22s">
-        <h2>近期动态</h2>
-        <ul>
-          <li>完成个人主页框架搭建与样式统一</li>
-          <li>接入托福单词游戏作为核心互动模块</li>
-          <li>优化移动端布局与按钮触控体验</li>
-        </ul>
-      </section>
+    <section id="leadership"><h2>领导力与社会贡献：四维评估</h2><div class="metrics">
+      <div class="metric"><b>01 时间长度</b>持续数年通常比一次性、短期参与更能体现承诺。</div>
+      <div class="metric"><b>02 职位与责任</b>关注学生承担什么责任，而不仅是是否拥有头衔。</div>
+      <div class="metric"><b>03 影响范围</b>看影响了多少人、覆盖什么层级，以及能否用事实说明。</div>
+      <div class="metric"><b>04 实际意义</b>项目是否解决真实问题，并给受益者带来可验证的价值。</div>
+    </div><p>因此，低年级应先通过志愿活动、校内职位、社区项目和与成年人沟通等场景逐步训练能力；到高年级，再承担更复杂的项目和更高责任。</p></section>
 
-      <section class="card toefl" id="toefl" style="animation-delay:0.28s">
-        <h2>无限资源之托福单词</h2>
-        <p>按你的要求，主页直接复用并嵌入 <code>无限资源之托福单词.html</code>，可在此预览并开始练习。</p>
-        <div class="game-wrap">
-          <iframe title="无限资源之托福单词" src="./无限资源之托福单词.html" loading="lazy"></iframe>
-        </div>
-      </section>
-    </main>
-  </div>
+    <section id="global"><h2>全球视野如何形成</h2><p class="lead">全球视野不是独立“做出来”的标签，而是学术深度、社会参与与跨文化接触共同产生的认知结果。</p><div class="grid"><div class="card"><h3>接触差异</h3><p>与不同国家、文化和社会背景的人交流，主动离开单一环境。</p></div><div class="card"><h3>修正成见</h3><p>让原有认知与真实经验碰撞，识别固有假设和偏见。</p></div><div class="card"><h3>形成能力</h3><p>逐步建立多元观点、批判性思维以及理解复杂问题的能力。</p></div></div></section>
 
-  <footer id="contact">
-    Contact: jeff@example.com · GitHub: github.com/jeff · Built with passion.
-  </footer>
-</div>
+    <section id="actions"><h2>6–8年级行动清单</h2><ul class="checklist"><li>通过趣味介绍和真实体验理解不同学科</li><li>夯实数理思维、阅读和写作基础</li><li>对人文方向开展广泛且有序的阅读</li><li>对理科方向验证天赋、基础与学习速度</li><li>核实竞赛资格、课程要求和学校资源</li><li>参与持续性的社区或公益活动</li><li>练习与同龄人、成年人和机构沟通</li><li>争取校内职位，但重视责任胜过头衔</li><li>长期坚持一项体育或真实兴趣</li><li>通过复盘失败提升表达、协作与韧性</li><li>定期评估方向，而非过早锁死专业</li><li>到9年级前后逐步收敛并进入深度项目</li></ul></section>
+
+    <section id="risks"><h2>风险与常见误区</h2><ul class="risk"><li><strong>唯竞赛论：</strong>奖项很多，但缺少写作、人文理解、科研、贡献和领导力。</li><li><strong>盲目超前：</strong>以统一进度要求所有学生，忽视基础与天赋差异。</li><li><strong>临时造项目：</strong>到9年级才开始培养社交或领导力，缺乏长期积累。</li><li><strong>只看头衔：</strong>职位很高，却没有真实责任、影响范围和实际成果。</li><li><strong>功利化公益：</strong>重复常见活动但没有深入参与，也没有解决真实问题。</li><li><strong>兴趣焦虑：</strong>认为必须具备传统音体美特长，忽略真实、独特的小爱好。</li><li><strong>把个案当规律：</strong>用某个学生的录取故事推导确定因果，忽视综合评估与个体差异。</li></ul></section>
+
+    <section id="summary"><h2>最终总结</h2><p class="lead">先探索，后聚焦；先打基础，再追求成果；以真实兴趣和能力为起点，以长期行动和实际影响为证据。</p><p>全文最终落在三项底层能力：<strong>学术基础与学科深度、阅读写作与批判思维、领导力社交与持续兴趣</strong>。竞赛、科研、公益、体育和个人爱好都只是载体，关键在于它们是否共同呈现出一个真实、完整且持续成长的学生。</p><div class="note"><strong>内容说明：</strong>本页是对《学科的简介.docx》口语转录内容的结构化总结。涉及院校偏好、竞赛作用、课程进度及个案录取的判断均保留为原文观点或经验性建议，不构成录取保证。</div></section>
+    <div class="footer">Cisco-branded summary · 自包含 HTML · 2026</div>
+  </div></main>
 </body>
 </html>
