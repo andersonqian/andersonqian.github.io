@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeff | 个人主页</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f2ede3;
+    --ink: #13232f;
+    --panel: #fff8eb;
+    --deep: #0c3d57;
+    --accent: #ff7a2f;
+    --accent-2: #2f9c95;
+    --line: #d8c8b0;
+    --shadow: 0 12px 30px rgba(12, 61, 87, 0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    min-height: 100vh;
+    font-family: "Outfit", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(circle at 12% 14%, rgba(47, 156, 149, 0.16), transparent 42%),
+      radial-gradient(circle at 86% 84%, rgba(255, 122, 47, 0.16), transparent 40%),
+      linear-gradient(135deg, #efe6d7 0%, #f9f4ea 52%, #f3ebde 100%);
+    overflow-x: hidden;
+  }
+
+  .texture {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.15;
+    background-image: linear-gradient(transparent 97%, rgba(0,0,0,0.08) 100%);
+    background-size: 100% 4px;
+  }
+
+  .shell {
+    width: min(1180px, 92vw);
+    margin: 28px auto;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: rgba(255, 248, 235, 0.88);
+    backdrop-filter: blur(5px);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    animation: riseIn 0.8s ease;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(90deg, rgba(12, 61, 87, 0.08), transparent 68%);
+  }
+
+  .brand {
+    font-family: "ZCOOL XiaoWei", serif;
+    letter-spacing: 1px;
+    font-size: 1.35rem;
+    color: var(--deep);
+  }
+
+  nav {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    text-decoration: none;
+    color: var(--deep);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    background: #fff;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .chip:hover {
+    transform: translateY(-2px);
+    background: #fff3df;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 74vh;
+  }
+
+  aside {
+    border-right: 1px solid var(--line);
+    padding: 24px;
+    background: linear-gradient(180deg, rgba(47, 156, 149, 0.08), transparent 60%);
+  }
+
+  .avatar {
+    width: 112px;
+    height: 112px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    font-size: 2.1rem;
+    color: #fff;
+    margin-bottom: 16px;
+    background: linear-gradient(150deg, var(--deep), var(--accent-2));
+    box-shadow: 0 10px 20px rgba(12, 61, 87, 0.25);
+  }
+
+  .name {
+    font-family: "ZCOOL XiaoWei", serif;
+    font-size: 1.45rem;
+    color: var(--deep);
+  }
+
+  .role {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: #35576a;
+    line-height: 1.5;
+  }
+
+  .meta {
+    margin-top: 18px;
+    display: grid;
+    gap: 8px;
+    font-size: 0.92rem;
+    color: #35576a;
+  }
+
+  .meta span {
+    display: block;
+    padding: 8px 10px;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.7);
+  }
+
+  main {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 16px;
+  }
+
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: var(--panel);
+    box-shadow: 0 8px 20px rgba(12, 61, 87, 0.08);
+    padding: 18px;
+    animation: fadeUp 0.7s ease both;
+  }
+
+  .card h2 {
+    font-family: "ZCOOL XiaoWei", serif;
+    color: var(--deep);
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+
+  .card p {
+    color: #2f4656;
+    line-height: 1.65;
+    font-size: 0.95rem;
+  }
+
+  .hero {
+    grid-column: span 8;
+    background:
+      linear-gradient(120deg, rgba(47, 156, 149, 0.12), rgba(255, 122, 47, 0.12)),
+      var(--panel);
+  }
+
+  .hero h1 {
+    font-family: "ZCOOL XiaoWei", serif;
+    font-size: 2.1rem;
+    color: var(--deep);
+    margin-bottom: 10px;
+  }
+
+  .hero p {
+    max-width: 52ch;
+  }
+
+  .cta {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    text-decoration: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-weight: 500;
+    font-size: 0.93rem;
+    transition: transform 0.2s ease;
+  }
+
+  .btn:hover { transform: translateY(-2px); }
+
+  .btn-main {
+    color: #fff;
+    background: linear-gradient(120deg, var(--deep), var(--accent-2));
+  }
+
+  .btn-sub {
+    color: var(--deep);
+    border: 1px solid var(--line);
+    background: #fff;
+  }
+
+  .skills { grid-column: span 4; }
+  .project { grid-column: span 7; }
+  .timeline { grid-column: span 5; }
+  .toefl { grid-column: 1 / -1; }
+
+  .skill-list {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .skill-list span {
+    padding: 7px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: #fff;
+    font-size: 0.85rem;
+  }
+
+  .timeline ul {
+    margin-top: 10px;
+    list-style: none;
+    display: grid;
+    gap: 10px;
+  }
+
+  .timeline li {
+    padding: 10px;
+    border-left: 3px solid var(--accent-2);
+    background: #fff;
+    border-radius: 0 10px 10px 0;
+    font-size: 0.9rem;
+    color: #2f4656;
+  }
+
+  .game-wrap {
+    margin-top: 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+  }
+
+  iframe {
+    width: 100%;
+    height: 620px;
+    border: 0;
+    display: block;
+  }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 14px 24px;
+    font-size: 0.85rem;
+    color: #486273;
+    background: rgba(12, 61, 87, 0.05);
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 980px) {
+    .grid { grid-template-columns: 1fr; }
+    aside { border-right: 0; border-bottom: 1px solid var(--line); }
+    .hero, .skills, .project, .timeline { grid-column: 1 / -1; }
+  }
+
+  @media (max-width: 640px) {
+    .shell { width: 95vw; margin: 14px auto; }
+    header, aside, main, footer { padding-left: 14px; padding-right: 14px; }
+    .hero h1 { font-size: 1.62rem; }
+    iframe { height: 500px; }
+  }
+</style>
+</head>
+<body>
+<div class="texture" aria-hidden="true"></div>
+
+<div class="shell">
+  <header>
+    <div class="brand">Jeff Portfolio</div>
+    <nav>
+      <a class="chip" href="#about">关于我</a>
+      <a class="chip" href="#projects">项目</a>
+      <a class="chip" href="#toefl">托福单词</a>
+      <a class="chip" href="#contact">联系</a>
+    </nav>
+  </header>
+
+  <div class="grid">
+    <aside id="about">
+      <div class="avatar">J</div>
+      <div class="name">Jeff</div>
+      <div class="role">学习者 / 创作者 / 前端爱好者</div>
+      <div class="meta">
+        <span>📍 China</span>
+        <span>🎯 Focus: AI + Learning Tools</span>
+        <span>⚡ Motto: Build and Share</span>
+      </div>
+    </aside>
+
+    <main>
+      <section class="card hero" style="animation-delay:0.04s">
+        <h1>你好，我是 Jeff</h1>
+        <p>
+          这是我的个人主页。我把学习内容、实战项目和互动练习整合在同一个入口，方便快速浏览与演示。
+          页面结构参考图1，视觉语言参考图2，整体采用温暖纸感底色 + 现代信息卡片风格。
+        </p>
+        <div class="cta">
+          <a class="btn btn-main" href="#toefl">开始托福单词挑战</a>
+          <a class="btn btn-sub" href="#projects">查看项目列表</a>
+        </div>
+      </section>
+
+      <section class="card skills" style="animation-delay:0.1s">
+        <h2>技能标签</h2>
+        <div class="skill-list">
+          <span>HTML/CSS</span>
+          <span>JavaScript</span>
+          <span>UI Design</span>
+          <span>Prompting</span>
+          <span>Learning App</span>
+          <span>Game UX</span>
+        </div>
+      </section>
+
+      <section class="card project" id="projects" style="animation-delay:0.16s">
+        <h2>代表项目</h2>
+        <p>
+          <strong>无限资源之托福单词：</strong>把单词记忆做成了像素战斗游戏，结合语音播放、拼写输入、怪物血条、道具掉落和 Boss 机制，提升记忆参与感。
+        </p>
+        <div class="cta">
+          <a class="btn btn-main" href="./无限资源之托福单词.html" target="_blank" rel="noopener noreferrer">新窗口打开完整游戏</a>
+        </div>
+      </section>
+
+      <section class="card timeline" style="animation-delay:0.22s">
+        <h2>近期动态</h2>
+        <ul>
+          <li>完成个人主页框架搭建与样式统一</li>
+          <li>接入托福单词游戏作为核心互动模块</li>
+          <li>优化移动端布局与按钮触控体验</li>
+        </ul>
+      </section>
+
+      <section class="card toefl" id="toefl" style="animation-delay:0.28s">
+        <h2>无限资源之托福单词</h2>
+        <p>按你的要求，主页直接复用并嵌入 <code>无限资源之托福单词.html</code>，可在此预览并开始练习。</p>
+        <div class="game-wrap">
+          <iframe title="无限资源之托福单词" src="./无限资源之托福单词.html" loading="lazy"></iframe>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer id="contact">
+    Contact: jeff@example.com · GitHub: github.com/jeff · Built with passion.
+  </footer>
+</div>
+</body>
+</html>
